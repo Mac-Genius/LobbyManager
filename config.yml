@@ -1,0 +1,7 @@
+# This is for changing the ip, user, and password for the database.
+
+ip address: localhost
+database: minecraft
+user: root
+password: default
+coords:

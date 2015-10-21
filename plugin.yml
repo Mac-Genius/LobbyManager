@@ -1,0 +1,27 @@
+name: ScoreboardMaster
+main: io.github.mac_genius.scoreboardmaster.ScoreboardMaster
+version: 1.0
+permissions:
+    scoreboardmaster.*:
+        description: Gives access to all commands for the plugin
+        children:
+            scoreboardmaster.reload: true
+            scoreboardmaster.help: true
+
+    scoreboardmaster.reload:
+        description: Allows a player to reload the config
+        default: op
+    scoreboardmaster.help:
+        description: Brings up the commands
+        default: op
+commands:
+    sm:
+        description: This is the help command.
+        usage: /sm
+        permission: scoreboardmaster.help
+        permission-message: You do not have permission to do that.
+    sm reload:
+            description: This will reload the plugin.
+            usage: /sm reload
+            permission: scoreboardmaster.reload
+            permission-message: You do not have permission to do that.
