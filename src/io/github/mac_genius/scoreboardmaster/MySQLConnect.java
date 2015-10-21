@@ -29,12 +29,6 @@ public class MySQLConnect {
             Bukkit.getLogger().warning("Error brah");
 
         }
-        if (con != null) {
-            plugin.getLogger().info(Ansi.ansi().fg(Ansi.Color.GREEN) + "Connected to the database!" + Ansi.ansi().fg(Ansi.Color.WHITE));
-        }
-        else {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Did not establish a connection." + Ansi.ansi().fg(Ansi.Color.WHITE));
-        }
         return con;
     }
 }

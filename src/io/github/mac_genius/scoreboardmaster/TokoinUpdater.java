@@ -2,6 +2,7 @@ package io.github.mac_genius.scoreboardmaster;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -17,17 +18,30 @@ import java.util.ArrayList;
  * Created by Mac on 5/7/2015.
  */
 public class TokoinUpdater {
-    PreparedStatement statement;
-    ResultSet resultSet;
-    PreparedStatement addPlayer;
+    private PreparedStatement statement;
+    private ResultSet resultSet;
+    private PreparedStatement addPlayer;
+    private Plugin plugin;
+    private MySQLConnect connect;
+    private Connection connection;
 
-    public void updateTokoin(Connection connectionIn, Player playerIn) {
+    public TokoinUpdater(Plugin plugin) {
+        this.plugin = plugin;
+        connect = new MySQLConnect(this.plugin);
+        try {
+            connection = connect.getServer(this.plugin);
+        } catch (Exception e) {
+            plugin.getLogger().warning("Database connection error");
+        }
+    }
+
+    public void updateTokoin(Player playerIn) {
         statement = null;
         resultSet = null;
         addPlayer = null;
 
         try {
-            statement = connectionIn.prepareStatement("SELECT * FROM players");
+            statement = connection.prepareStatement("SELECT * FROM players");
             resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
@@ -62,7 +76,7 @@ public class TokoinUpdater {
                     }
                 }
             }
-            addPlayer = connectionIn.prepareStatement("INSERT INTO players(Uuid, Tokoin) VALUES(?, ?)");
+            addPlayer = connection.prepareStatement("INSERT INTO players(Uuid, Tokoin) VALUES(?, ?)");
             addPlayer.setString(1, playerIn.getUniqueId().toString());
             addPlayer.setInt(2, 5000);
             addPlayer.executeUpdate();
@@ -105,6 +119,9 @@ public class TokoinUpdater {
                 }
                 if (addPlayer != null) {
                     addPlayer.close();
+                }
+                if (connection != null) {
+                    connection.close();
                 }
             } catch (SQLException e) {
                 Bukkit.getLogger().warning("Error closing database connections.");

@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 public class ScoreboardMaster extends JavaPlugin implements PluginMessageListener {
     Plugin plugin = this;
-    MySQLConnect connect = new MySQLConnect(plugin);
+    MySQLConnect connect;
     Connection connection;
     PreparedStatement playerTable;
     String[] serverList;
@@ -30,6 +30,7 @@ public class ScoreboardMaster extends JavaPlugin implements PluginMessageListene
         plugin.saveDefaultConfig();
         playerCount = new HashMap<>();
         thrown = new HashMap<>();
+        connect = new MySQLConnect(plugin);
         try {
             connection = connect.getServer(plugin);
             playerTable = connection.prepareStatement("CREATE TABLE IF NOT EXISTS Players(Id INT PRIMARY KEY AUTO_INCREMENT, Uuid VARCHAR(36), Tokoin INT)");
@@ -41,6 +42,7 @@ public class ScoreboardMaster extends JavaPlugin implements PluginMessageListene
                 if (playerTable != null) {
                     playerTable.close();
                 }
+                connection.close();
             } catch (SQLException e) {
                 getLogger().warning("playerTable Exception.");
             }
@@ -48,7 +50,7 @@ public class ScoreboardMaster extends JavaPlugin implements PluginMessageListene
             ScoreboardManager manager = Bukkit.getScoreboardManager();
             BukkitScheduler taskSchedule = Bukkit.getScheduler();
             SecondaryThread secondaryThread = new SecondaryThread(manager, plugin, playerCount);
-            getServer().getPluginManager().registerEvents(new EventListeners(manager, taskSchedule, plugin, connection, playerCount, thrown), this);
+            getServer().getPluginManager().registerEvents(new EventListeners(manager, taskSchedule, plugin, playerCount, thrown), this);
             taskSchedule.runTaskTimerAsynchronously(plugin, secondaryThread, 0, 10);
             this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
             this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);

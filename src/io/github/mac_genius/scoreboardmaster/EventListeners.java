@@ -30,15 +30,13 @@ public class EventListeners implements Listener {
     ScoreboardManager manager;
     BukkitScheduler schedule;
     Plugin plugin;
-    Connection connection;
     HashMap<String, String> playerCount;
     HashMap<Player, Boolean> thrown;
 
-    public EventListeners(ScoreboardManager managerIn, BukkitScheduler scheduleIn, Plugin pluginIn, Connection connectionIn, HashMap<String, String> playerCountIn, HashMap<Player, Boolean> thrownIn) {
+    public EventListeners(ScoreboardManager managerIn, BukkitScheduler scheduleIn, Plugin pluginIn, HashMap<String, String> playerCountIn, HashMap<Player, Boolean> thrownIn) {
         manager = managerIn;
         schedule = scheduleIn;
         plugin = pluginIn;
-        connection = connectionIn;
         playerCount = playerCountIn;
         thrown = thrownIn;
     }
@@ -104,8 +102,8 @@ public class EventListeners implements Listener {
         // Sets the Scoreboard for a joining player
         ScoreboardSetup setup = new ScoreboardSetup(player, manager);
         setup.setScoreboard();
-        TokoinUpdater tokoinUpdater = new TokoinUpdater();
-        tokoinUpdater.updateTokoin(connection, event.getPlayer());
+        TokoinUpdater tokoinUpdater = new TokoinUpdater(plugin);
+        tokoinUpdater.updateTokoin(event.getPlayer());
         try {
             if (plugin.getConfig().getString("coords") == null || !plugin.getConfig().getString("coords").equals("")) {
                 String coords = plugin.getConfig().getString("coords");
