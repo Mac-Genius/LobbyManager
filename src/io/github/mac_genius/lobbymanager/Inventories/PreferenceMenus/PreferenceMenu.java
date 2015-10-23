@@ -83,10 +83,12 @@ public class PreferenceMenu implements Listener {
         if (preferences.arePlayersVisible()) {
             name = ChatColor.GREEN + "Enabled";
             lore.add(ChatColor.WHITE + "You can see other players.");
+            lore.add(ChatColor.WHITE + "Left click to toggle player visibility");
             return makeItem(Material.STAINED_GLASS_PANE, name, lore, (byte) 5);
         } else {
             name = ChatColor.RED + "Disabled";
             lore.add(ChatColor.WHITE + "Players are invisible.");
+            lore.add(ChatColor.WHITE + "Left click to toggle player visibility");
             return makeItem(Material.STAINED_GLASS_PANE, name, lore, (byte) 14);
         }
     }
@@ -97,10 +99,12 @@ public class PreferenceMenu implements Listener {
         if (preferences.canStack()) {
             name = ChatColor.GREEN + "Enabled";
             lore.add(ChatColor.WHITE + "You can stack other players.");
+            lore.add(ChatColor.WHITE + "Left click to toggle stacker");
             return makeItem(Material.STAINED_GLASS_PANE, name, lore, (byte) 5);
         } else {
             name = ChatColor.RED + "Disabled";
             lore.add(ChatColor.WHITE + "Stacker game is disabled.");
+            lore.add(ChatColor.WHITE + "Left click to toggle stacker");
             return makeItem(Material.STAINED_GLASS_PANE, name, lore, (byte) 14);
         }
     }
@@ -111,18 +115,22 @@ public class PreferenceMenu implements Listener {
         if (preferences.getTime() == 0) {
             name = ChatColor.GREEN + "Sunrise";
             lore.add(ChatColor.WHITE + "What a lovely morning.");
+            lore.add(ChatColor.WHITE + "Left click to toggle the time");
             return makeItem(Material.STAINED_GLASS_PANE, name, lore, (byte) 1);
         } else if (preferences.getTime() == 1) {
             name = ChatColor.GREEN + "Noon";
             lore.add(ChatColor.WHITE + "Halfway through the day.");
+            lore.add(ChatColor.WHITE + "Left click to toggle the time");
             return makeItem(Material.STAINED_GLASS_PANE, name, lore, (byte) 4);
         } else if (preferences.getTime() == 2) {
             name = ChatColor.GREEN + "Sunset";
             lore.add(ChatColor.WHITE + "That is quite the sunset, eh?");
+            lore.add(ChatColor.WHITE + "Left click to toggle the time");
             return makeItem(Material.STAINED_GLASS_PANE, name, lore, (byte) 14);
         } else {
             name = ChatColor.RED + "Night";
             lore.add(ChatColor.WHITE + "The best time to get work done.");
+            lore.add(ChatColor.WHITE + "Left click to toggle the time");
             return makeItem(Material.STAINED_GLASS_PANE, name, lore, (byte) 15);
         }
     }
@@ -134,11 +142,13 @@ public class PreferenceMenu implements Listener {
             name = ChatColor.GREEN + "Clear";
             lore.add(ChatColor.WHITE + "We can see clearly now,");
             lore.add(ChatColor.WHITE + "the rain is gone.");
+            lore.add(ChatColor.WHITE + "Left click to toggle the weather");
             return makeItem(Material.STAINED_GLASS_PANE, name, lore, (byte) 3);
         } else {
             name = ChatColor.RED + "Raining";
             lore.add(ChatColor.WHITE + "Looks like you might want");
             lore.add(ChatColor.WHITE + "an umbrella today.");
+            lore.add(ChatColor.WHITE + "Left click to toggle the weather");
             return makeItem(Material.STAINED_GLASS_PANE, name, lore, (byte) 7);
         }
     }

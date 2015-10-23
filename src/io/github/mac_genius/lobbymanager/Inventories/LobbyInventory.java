@@ -46,7 +46,7 @@ public class LobbyInventory {
         String name = ChatColor.GOLD + "Lobby Settings  " + ChatColor.GRAY + "(Right Click to open)";
         ArrayList<String> lore = new ArrayList<>();
         lore.add(ChatColor.ITALIC + "Your lobby settings.");
-        return makeItem(Material.ARMOR_STAND, name, lore, (byte) 0);
+        return makeItem(Material.PAPER, name, lore, (byte) 0);
     }
 
     private ItemStack makeItem(Material type, String name, ArrayList<String> lore, byte color) {
