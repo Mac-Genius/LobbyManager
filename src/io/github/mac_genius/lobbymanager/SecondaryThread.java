@@ -1,7 +1,8 @@
-package io.github.mac_genius.scoreboardmaster;
+package io.github.mac_genius.lobbymanager;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import io.github.mac_genius.lobbymanager.Inventories.CompassInventory;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;

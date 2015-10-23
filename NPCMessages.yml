@@ -1,0 +1,7 @@
+# Customizable messages! Put the job here with a list of messages it should print.
+
+example_job:
+    - 'Hi there!'
+    - 'This is the default text.'
+    - 'Perhaps you would like to add your own?'
+    - 'It is simple to do!'

@@ -1,5 +1,5 @@
-name: ScoreboardMaster
-main: io.github.mac_genius.scoreboardmaster.ScoreboardMaster
+name: LobbyManager
+main: io.github.mac_genius.lobbymanager.LobbyManager
 version: 1.0
 permissions:
     scoreboardmaster.*:
@@ -18,10 +18,10 @@ commands:
     sm:
         description: This is the help command.
         usage: /sm
-        permission: scoreboardmaster.help
+        permission: lobbymanager.help
         permission-message: You do not have permission to do that.
     sm reload:
             description: This will reload the plugin.
             usage: /sm reload
-            permission: scoreboardmaster.reload
+            permission: lobbymanager.reload
             permission-message: You do not have permission to do that.

@@ -1,4 +1,4 @@
-package io.github.mac_genius.scoreboardmaster;
+package io.github.mac_genius.lobbymanager.Inventories;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

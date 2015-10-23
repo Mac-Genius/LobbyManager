@@ -1,9 +1,24 @@
-package io.github.mac_genius.scoreboardmaster;
+package io.github.mac_genius.lobbymanager.Listeners;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import io.github.mac_genius.lobbymanager.Inventories.CompassInventory;
+import io.github.mac_genius.lobbymanager.Inventories.PreferenceMenus.PreferenceMenu;
+import io.github.mac_genius.lobbymanager.Inventories.WhitelistMenus.WhitelistMenu;
+import io.github.mac_genius.lobbymanager.Inventories.LobbyInventory;
+import io.github.mac_genius.lobbymanager.KillRunner;
+import io.github.mac_genius.lobbymanager.Listeners.ListenerExtensions.PlayerInitializer;
+import io.github.mac_genius.lobbymanager.Listeners.ListenerExtensions.UpdateInvisible;
+import io.github.mac_genius.lobbymanager.NPCHandler.MessageConfig;
+import io.github.mac_genius.lobbymanager.NPCHandler.NPCMessages;
+import io.github.mac_genius.lobbymanager.ScoreboardHandler.ScoreboardSetup;
+import io.github.mac_genius.lobbymanager.database.NPCList;
+import io.github.mac_genius.lobbymanager.database.Preferences;
+import io.github.mac_genius.lobbymanager.database.SQLObjects.PlayerPreference;
+import io.github.mac_genius.lobbymanager.database.ServerWhitelist;
+import io.github.mac_genius.lobbymanager.database.TokoinUpdater;
 import org.bukkit.*;
-import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,46 +29,55 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.util.Vector;
+import org.fusesource.jansi.Ansi;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
 public class EventListeners implements Listener {
-    ScoreboardManager manager;
-    BukkitScheduler schedule;
-    Plugin plugin;
-    HashMap<String, String> playerCount;
-    HashMap<Player, Boolean> thrown;
+    private ScoreboardManager manager;
+    private BukkitScheduler schedule;
+    private Plugin plugin;
+    private HashMap<String, String> playerCount;
+    private HashMap<Player, Boolean> thrown;
+    private HashMap<Entity, String> npcs;
+    private MessageConfig messageConfig;
 
-    public EventListeners(ScoreboardManager managerIn, BukkitScheduler scheduleIn, Plugin pluginIn, HashMap<String, String> playerCountIn, HashMap<Player, Boolean> thrownIn) {
+    public EventListeners(ScoreboardManager managerIn, BukkitScheduler scheduleIn, Plugin pluginIn, HashMap<String, String> playerCountIn, HashMap<Player, Boolean> thrownIn, HashMap<Entity, String> npcs, MessageConfig messageConfig) {
         manager = managerIn;
         schedule = scheduleIn;
         plugin = pluginIn;
         playerCount = playerCountIn;
         thrown = thrownIn;
+        this.npcs = npcs;
+        this.messageConfig = messageConfig;
     }
 
     @EventHandler
     public void rightClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         try {
-            if (event.getAction() == Action.RIGHT_CLICK_AIR && event.getItem().getType() == Material.COMPASS || event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getItem().getType() == Material.COMPASS) {
-                CompassInventory compassInventory = new CompassInventory(plugin, player, playerCount);
-                player.openInventory(compassInventory.getInventory(player));
+            if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                if (event.getItem().getType() == Material.COMPASS) {
+                    CompassInventory compassInventory = new CompassInventory(plugin, player, playerCount);
+                    player.openInventory(compassInventory.getInventory(player));
+                } else if (event.getItem().getType() == Material.BOOK) {
+                    plugin.getServer().getPluginManager().registerEvents(new WhitelistMenu(plugin, player), plugin);
+                } else if (event.getItem().getType() == Material.ARMOR_STAND) {
+                    plugin.getServer().getPluginManager().registerEvents(new PreferenceMenu(plugin, player), plugin);
+                }
             }
             if (player.getPassenger() != null && event.getAction() == Action.LEFT_CLICK_AIR) {
                 throwEntity(event.getPlayer(), event.getPlayer().getPassenger());
             }
         } catch (NullPointerException e) {
-            return;
+            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Error with PlayerInteractEvent." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -91,40 +115,9 @@ public class EventListeners implements Listener {
     @EventHandler
     public void onLogin(PlayerJoinEvent event) throws IllegalArgumentException {
         Player player = event.getPlayer();
-        player.getInventory().setHeldItemSlot(0);
-        player.setGameMode(GameMode.SURVIVAL);
         event.setJoinMessage("");
-        player.setAllowFlight(true);
-        PlayerInventory inventory = new PlayerInventory(player);
-        inventory.setPlayerInventory();
-        thrown.put(player, false);
-
-        // Sets the Scoreboard for a joining player
-        ScoreboardSetup setup = new ScoreboardSetup(player, manager);
-        setup.setScoreboard();
-        TokoinUpdater tokoinUpdater = new TokoinUpdater(plugin);
-        tokoinUpdater.updateTokoin(event.getPlayer());
-        try {
-            if (plugin.getConfig().getString("coords") == null || !plugin.getConfig().getString("coords").equals("")) {
-                String coords = plugin.getConfig().getString("coords");
-                Scanner scan = new Scanner(coords);
-                double x = Double.parseDouble(scan.next());
-                double y = Double.parseDouble(scan.next());
-                double z = Double.parseDouble(scan.next());
-                float yaw = 0;
-                float pitch = 0;
-                if (scan.hasNext()) {
-                    yaw = Float.parseFloat(scan.next());
-                }
-                if (scan.hasNext()) {
-                    pitch = Float.parseFloat(scan.next());
-                }
-                player.teleport(new Location(event.getPlayer().getWorld(), x, y, z, yaw, pitch));
-            }
-        } catch (NullPointerException e) {
-            plugin.getLogger().warning("You're using an outdated version of the config. Please delete it and restart.");
-        }
-        player.setFoodLevel(1000000000);
+        new PlayerInitializer(plugin, player, thrown, manager);
+        new UpdateInvisible(plugin, player);
     }
 
     @EventHandler
@@ -132,11 +125,29 @@ public class EventListeners implements Listener {
         if (event.getWhoClicked().getOpenInventory().getTitle().equals("Server Menu:")) {
             try {
                 if (event.getCurrentItem().getType() == Material.DIAMOND_PICKAXE) {
-                    ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                    out.writeUTF("Connect");
-                    out.writeUTF("Survival-1");
-                    ((Player) event.getWhoClicked()).sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
-                    ((Player) event.getWhoClicked()).sendMessage("Sending you to Survival!");
+                    ServerWhitelist whitelist = new ServerWhitelist(plugin);
+                    if (whitelist.getWhitelisted(event.getWhoClicked().getUniqueId().toString())) {
+                        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                        out.writeUTF("Connect");
+                        out.writeUTF("Survival-1");
+                        ((Player) event.getWhoClicked()).sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
+                        ((Player) event.getWhoClicked()).sendMessage("Sending you to Survival!");
+                    } else {
+                        NPCMessages messages = new NPCMessages(messageConfig, plugin, (Player) event.getWhoClicked());
+                        if (whitelist.getBanned(event.getWhoClicked().getUniqueId().toString())) {
+                            for (String s : messages.getMessages("vanilla_register")) {
+                                event.getWhoClicked().sendMessage(s);
+                            }
+                        } else if (whitelist.getWhitelistStatus(event.getWhoClicked().getUniqueId().toString()) == 0) {
+                            for (String s : messages.getMessages("van_go")) {
+                                event.getWhoClicked().sendMessage(s);
+                            }
+                        } else {
+                            for (String s : messages.getMessages("van_wait")) {
+                                event.getWhoClicked().sendMessage(s);
+                            }
+                        }
+                    }
                 }
                 if (event.getCurrentItem().getType() == Material.ROTTEN_FLESH) {
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
@@ -221,6 +232,15 @@ public class EventListeners implements Listener {
 
     @EventHandler
     public void pickupPlayer(PlayerInteractEntityEvent event) {
+        if (npcs.containsKey(event.getRightClicked())) {
+            NPCList list = new NPCList(plugin);
+            NPCMessages npcMessages = new NPCMessages(messageConfig, plugin, event.getPlayer());
+            ArrayList<String> messages = npcMessages.getMessages(list.getJob(event.getRightClicked()));
+            for (String s : messages) {
+                event.getPlayer().sendMessage(s);
+            }
+            event.setCancelled(true);
+        }
         try {
             ArrayList<Entity> nearbyEntities = new ArrayList<>(event.getPlayer().getNearbyEntities(4, 4, 4));
             Entity closest = nearbyEntities.get(0);
@@ -242,7 +262,21 @@ public class EventListeners implements Listener {
     }
 
     public void stack(Entity stackerIn, Entity stackIn) {
-        if (stackerIn == stackIn) {
+        if (stackerIn instanceof Player) {
+            PlayerPreference preferences = new Preferences(plugin).getPreferences(((Player) stackerIn).getUniqueId().toString());
+            if (!preferences.canStack()) {
+                stackerIn.sendMessage(ChatColor.GREEN + "You are not playing stacker right now.");
+                return;
+            }
+        }
+        if (stackIn instanceof Player) {
+            PlayerPreference preferences = new Preferences(plugin).getPreferences(((Player) stackIn).getUniqueId().toString());
+            if (!preferences.arePlayersVisible() || !preferences.canStack()) {
+                stackerIn.sendMessage(ChatColor.GREEN + ((Player) stackIn).getDisplayName() + " is not playing the stack game right now.");
+                return;
+            }
+        }
+        if (stackerIn == stackIn || npcs.containsKey(stackIn) || stackIn instanceof ArmorStand) {
             return;
         }
         if (stackerIn.getPassenger() != null) {
@@ -256,7 +290,7 @@ public class EventListeners implements Listener {
     @EventHandler
     public void playerLeave(PlayerQuitEvent event) {
         event.setQuitMessage("");
-        for (Player p : thrown.keySet()) {
+        for (Player p : new ArrayList<>(thrown.keySet())) {
             if (p == event.getPlayer()) {
                 thrown.remove(p);
             }

@@ -1,4 +1,4 @@
-package io.github.mac_genius.scoreboardmaster;
+package io.github.mac_genius.lobbymanager;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
