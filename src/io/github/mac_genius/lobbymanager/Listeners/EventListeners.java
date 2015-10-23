@@ -262,6 +262,9 @@ public class EventListeners implements Listener {
     }
 
     public void stack(Entity stackerIn, Entity stackIn) {
+        if (stackerIn == stackIn || npcs.containsKey(stackIn) || stackIn instanceof ArmorStand) {
+            return;
+        }
         if (stackerIn instanceof Player) {
             PlayerPreference preferences = new Preferences(plugin).getPreferences(((Player) stackerIn).getUniqueId().toString());
             if (!preferences.canStack()) {
@@ -275,9 +278,6 @@ public class EventListeners implements Listener {
                 stackerIn.sendMessage(ChatColor.GREEN + ((Player) stackIn).getDisplayName() + " is not playing the stack game right now.");
                 return;
             }
-        }
-        if (stackerIn == stackIn || npcs.containsKey(stackIn) || stackIn instanceof ArmorStand) {
-            return;
         }
         if (stackerIn.getPassenger() != null) {
             stack(stackerIn.getPassenger(), stackIn);
