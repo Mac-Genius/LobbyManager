@@ -8,12 +8,14 @@ Implements player preferences so they can control the lobby enviroment.
 
 Stores player information on a MySQL server so that it can be retreived on different lobbies.
 
-To-do list:
+---
 
-Implement pets
+###To-do:
 
-Implement a store
+1. ~~Implement pets~~      *Finished 10/25*
 
-Create a friends list
+2. ~~Implement a store~~ *Finished 10/25*
 
-Change offline UUIDs to online UUIDs
+3. Create a friends list
+
+4. Change offline UUIDs to online UUIDs
