@@ -1,5 +1,6 @@
 package io.github.mac_genius.lobbymanager.Inventories;
 
+import io.github.mac_genius.lobbymanager.ServerSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -15,15 +16,12 @@ import java.util.*;
  * Created by Mac on 6/22/2015.
  */
 public class CompassInventory {
-    private Plugin plugin;
-    private String[] serverList;
-    HashMap<String, String> playerCount;
+    private ServerSettings settings;
     private Player player;
 
-    public CompassInventory(Plugin pluginIn, Player playerIn, HashMap<String, String> playerCountIn) {
-        plugin = pluginIn;
+    public CompassInventory(ServerSettings settings, Player playerIn) {
+        this.settings = settings;
         player = playerIn;
-        playerCount = playerCountIn;
     }
 
     public Inventory getInventory(Player playerIn) {
@@ -60,10 +58,10 @@ public class CompassInventory {
         String amount = "There are currently ";
         int playerAmounts = 0;
         if (serverType.contains(serverType)) {
-            Set<String> stuff = playerCount.keySet();
+            Set<String> stuff = settings.getPlayerCount().keySet();
             for (String key : stuff) {
                 if (key.contains(serverType)) {
-                    playerAmounts += Integer.parseInt(playerCount.get(key));
+                    playerAmounts += Integer.parseInt(settings.getPlayerCount().get(key));
                 }
             }
         }

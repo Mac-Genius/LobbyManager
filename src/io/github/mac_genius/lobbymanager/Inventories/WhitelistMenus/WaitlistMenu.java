@@ -1,5 +1,6 @@
 package io.github.mac_genius.lobbymanager.Inventories.WhitelistMenus;
 
+import io.github.mac_genius.lobbymanager.ServerSettings;
 import io.github.mac_genius.lobbymanager.database.ServerWhitelist;
 import io.github.mac_genius.lobbymanager.database.SQLObjects.WhitelistResult;
 import org.bukkit.Bukkit;
@@ -23,27 +24,27 @@ import java.util.ArrayList;
  * Created by Mac on 10/22/2015.
  */
 public class WaitlistMenu implements Listener {
-    private Plugin plugin;
+    private ServerSettings settings;
     private Player player;
     private ServerWhitelist whitelist;
     private int inventorySize;
 
-    public WaitlistMenu(Plugin plugin, Player player) {
-        this.plugin = plugin;
+    public WaitlistMenu(ServerSettings settings, Player player) {
+        this.settings = settings;
         this.player = player;
-        whitelist = new ServerWhitelist(plugin);
+        whitelist = new ServerWhitelist(settings);
         setInventory();
     }
 
     private void setInventory() {
         int size = whitelist.waitlistSize();
-        if (size < 10) {
+        if (size < 9) {
             size = 18;
-        } else if (size < 19) {
+        } else if (size < 18) {
             size = 27;
-        } else if (size < 28) {
+        } else if (size < 27) {
             size = 36;
-        } else if (size < 37) {
+        } else if (size < 36) {
             size = 45;
         } else {
             size = 54;
@@ -103,17 +104,17 @@ public class WaitlistMenu implements Listener {
         if (event.getWhoClicked() == player) {
             if (event.getCurrentItem().getType() == Material.STAINED_GLASS_PANE && event.getSlot() == inventorySize - 1) {
                 HandlerList.unregisterAll(this);
-                plugin.getServer().getPluginManager().registerEvents(new WhitelistMenu(plugin, player), plugin);
+                settings.getPlugin().getServer().getPluginManager().registerEvents(new WhitelistMenu(settings, player), settings.getPlugin());
             } else {
                 if (event.getClick() == ClickType.LEFT) {
                     whitelist.setWhitelistStatus(event.getCurrentItem().getItemMeta().getLore().get(1), 2);
                     HandlerList.unregisterAll(this);
-                    plugin.getServer().getPluginManager().registerEvents(new WaitlistMenu(plugin, player), plugin);
+                    settings.getPlugin().getServer().getPluginManager().registerEvents(new WaitlistMenu(settings, player), settings.getPlugin());
                     player.sendMessage(ChatColor.GREEN + "Player has been added to the whitelist.");
                 } else {
                     whitelist.setWhitelistStatus(event.getCurrentItem().getItemMeta().getLore().get(1), 3);
                     HandlerList.unregisterAll(this);
-                    plugin.getServer().getPluginManager().registerEvents(new WaitlistMenu(plugin, player), plugin);
+                    settings.getPlugin().getServer().getPluginManager().registerEvents(new WaitlistMenu(settings, player), settings.getPlugin());
                     player.sendMessage(ChatColor.GREEN + "Player has been added to the banned list.");
                 }
             }

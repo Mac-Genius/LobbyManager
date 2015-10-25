@@ -1,5 +1,6 @@
 package io.github.mac_genius.lobbymanager.database;
 
+import io.github.mac_genius.lobbymanager.ServerSettings;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -18,13 +19,13 @@ import java.util.ArrayList;
  * Created by Mac on 5/7/2015.
  */
 public class TokoinUpdater {
-    private Plugin plugin;
+    private ServerSettings settings;
     private SQLConnect connect;
     private Player player;
 
-    public TokoinUpdater(Plugin plugin, Player player) {
-        this.plugin = plugin;
-        connect = new SQLConnect(this.plugin);
+    public TokoinUpdater(ServerSettings settings, Player player) {
+        this.settings = settings;
+        connect = new SQLConnect(settings);
         this.player = player;
     }
 
@@ -44,7 +45,7 @@ public class TokoinUpdater {
             updateScoreboard(getTokoins());
             connection.close();
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not add the player to database." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not add the player to database." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -57,7 +58,7 @@ public class TokoinUpdater {
             add.executeUpdate();
             connection.close();
         } catch (SQLException c) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not add the player to database." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not add the player to database." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -74,7 +75,7 @@ public class TokoinUpdater {
             connection.close();
             return tokoins;
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not add the player to database." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not add the player to database." + Ansi.ansi().fg(Ansi.Color.WHITE));
             return tokoins;
         }
     }
@@ -88,7 +89,7 @@ public class TokoinUpdater {
             updateScoreboard(getTokoins());
             connection.close();
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not set the player's tokoin amount." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not set the player's tokoin amount." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -102,7 +103,7 @@ public class TokoinUpdater {
             updateScoreboard(getTokoins());
             connection.close();
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not set the player's tokoin amount." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not set the player's tokoin amount." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 

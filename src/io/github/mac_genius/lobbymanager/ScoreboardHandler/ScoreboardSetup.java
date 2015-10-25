@@ -1,5 +1,6 @@
 package io.github.mac_genius.lobbymanager.ScoreboardHandler;
 
+import io.github.mac_genius.lobbymanager.ServerSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -13,14 +14,14 @@ import org.bukkit.scoreboard.ScoreboardManager;
  */
 public class ScoreboardSetup {
     private Player player;
-    private ScoreboardManager manager;
-    public ScoreboardSetup(Player playerIn, ScoreboardManager managerIn) {
+    private ServerSettings settings;
+    public ScoreboardSetup(Player playerIn, ServerSettings settings) {
         player = playerIn;
-        manager = managerIn;
+        this.settings = settings;
     }
 
     public void setScoreboard() {
-        Scoreboard scoreboard = manager.getNewScoreboard();
+        Scoreboard scoreboard = settings.getManager().getNewScoreboard();
         player.setScoreboard(scoreboard);
         Objective o = scoreboard.registerNewObjective("1", "dummy");
         o.setDisplaySlot(DisplaySlot.SIDEBAR);

@@ -1,5 +1,6 @@
 package io.github.mac_genius.lobbymanager.database;
 
+import io.github.mac_genius.lobbymanager.ServerSettings;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 import org.fusesource.jansi.Ansi;
@@ -13,12 +14,12 @@ import java.sql.SQLException;
  * Created by Mac on 10/21/2015.
  */
 public class NPCList {
-    private Plugin plugin;
+    private ServerSettings settings;
     private SQLConnect connect;
 
-    public NPCList(Plugin plugin) {
-        this.plugin = plugin;
-        connect = new SQLConnect(this.plugin);
+    public NPCList(ServerSettings settings) {
+        this.settings = settings;
+        connect = new SQLConnect(settings);
     }
 
     public void addNPC(Entity entity, String job) {
@@ -35,14 +36,14 @@ public class NPCList {
                 addNPCToList(uuid, job, connection);
             }
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Adding the npc failed." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Adding the npc failed." + Ansi.ansi().fg(Ansi.Color.WHITE));
         } finally {
             try {
                 if (connection != null) {
                     connection.close();
                 }
             } catch (SQLException e) {
-                plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "An error occurred when closing the connection." + Ansi.ansi().fg(Ansi.Color.WHITE));
+                settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "An error occurred when closing the connection." + Ansi.ansi().fg(Ansi.Color.WHITE));
             }
         }
     }
@@ -54,7 +55,7 @@ public class NPCList {
             add.setString(2, job);
             add.executeUpdate();
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Adding the npc failed." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Adding the npc failed." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -76,7 +77,7 @@ public class NPCList {
                 return true;
             }
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Adding the npc failed." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Adding the npc failed." + Ansi.ansi().fg(Ansi.Color.WHITE));
             return false;
         }
     }
@@ -88,7 +89,7 @@ public class NPCList {
             PreparedStatement remove = connection.prepareStatement("DELETE FROM NPCList WHERE Uuid='" + uuid + "'");
             remove.executeUpdate();
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not remove the specified npc." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not remove the specified npc." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -103,7 +104,7 @@ public class NPCList {
             }
             connection.close();
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not fetch the job for the entity." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not fetch the job for the entity." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
         return job;
     }
@@ -115,7 +116,7 @@ public class NPCList {
             setJob.executeUpdate();
             connection.close();
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not set the job for the entity." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not set the job for the entity." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 }

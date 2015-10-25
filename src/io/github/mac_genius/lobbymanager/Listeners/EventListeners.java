@@ -7,11 +7,13 @@ import io.github.mac_genius.lobbymanager.Inventories.PreferenceMenus.PreferenceM
 import io.github.mac_genius.lobbymanager.Inventories.WhitelistMenus.WhitelistMenu;
 import io.github.mac_genius.lobbymanager.Inventories.LobbyInventory;
 import io.github.mac_genius.lobbymanager.KillRunner;
+import io.github.mac_genius.lobbymanager.Listeners.ListenerExtensions.InventoryClick;
 import io.github.mac_genius.lobbymanager.Listeners.ListenerExtensions.PlayerInitializer;
 import io.github.mac_genius.lobbymanager.Listeners.ListenerExtensions.UpdateInvisible;
 import io.github.mac_genius.lobbymanager.NPCHandler.MessageConfig;
 import io.github.mac_genius.lobbymanager.NPCHandler.NPCMessages;
 import io.github.mac_genius.lobbymanager.ScoreboardHandler.ScoreboardSetup;
+import io.github.mac_genius.lobbymanager.ServerSettings;
 import io.github.mac_genius.lobbymanager.database.NPCList;
 import io.github.mac_genius.lobbymanager.database.Preferences;
 import io.github.mac_genius.lobbymanager.database.SQLObjects.PlayerPreference;
@@ -25,9 +27,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityPortalEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.Plugin;
@@ -41,22 +47,10 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class EventListeners implements Listener {
-    private ScoreboardManager manager;
-    private BukkitScheduler schedule;
-    private Plugin plugin;
-    private HashMap<String, String> playerCount;
-    private HashMap<Player, Boolean> thrown;
-    private HashMap<Entity, String> npcs;
-    private MessageConfig messageConfig;
+    private ServerSettings settings;
 
-    public EventListeners(ScoreboardManager managerIn, BukkitScheduler scheduleIn, Plugin pluginIn, HashMap<String, String> playerCountIn, HashMap<Player, Boolean> thrownIn, HashMap<Entity, String> npcs, MessageConfig messageConfig) {
-        manager = managerIn;
-        schedule = scheduleIn;
-        plugin = pluginIn;
-        playerCount = playerCountIn;
-        thrown = thrownIn;
-        this.npcs = npcs;
-        this.messageConfig = messageConfig;
+    public EventListeners(ServerSettings settings) {
+        this.settings = settings;
     }
 
     @EventHandler
@@ -64,20 +58,13 @@ public class EventListeners implements Listener {
         Player player = event.getPlayer();
         try {
             if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                if (event.getItem().getType() == Material.COMPASS) {
-                    CompassInventory compassInventory = new CompassInventory(plugin, player, playerCount);
-                    player.openInventory(compassInventory.getInventory(player));
-                } else if (event.getItem().getType() == Material.BOOK) {
-                    plugin.getServer().getPluginManager().registerEvents(new WhitelistMenu(plugin, player), plugin);
-                } else if (event.getItem().getType() == Material.ARMOR_STAND) {
-                    plugin.getServer().getPluginManager().registerEvents(new PreferenceMenu(plugin, player), plugin);
-                }
+                new InventoryClick(settings, event.getPlayer());
             }
             if (player.getPassenger() != null && event.getAction() == Action.LEFT_CLICK_AIR) {
                 throwEntity(event.getPlayer(), event.getPlayer().getPassenger());
             }
         } catch (NullPointerException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Error with PlayerInteractEvent." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Error with PlayerInteractEvent." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -99,7 +86,7 @@ public class EventListeners implements Listener {
             thrower.eject();
             toThrow.setVelocity(thrower.getLocation().getDirection().multiply(2.0));
             if (toThrow instanceof Player) {
-                thrown.replace((Player) toThrow, true);
+                settings.getThrown().replace((Player) toThrow, true);
                 toThrow.sendMessage(ChatColor.AQUA + "You were thrown by " + ChatColor.RESET + ((Player) thrower).getDisplayName() + ChatColor.AQUA + "!");
             }
         }
@@ -108,7 +95,7 @@ public class EventListeners implements Listener {
     @EventHandler
     public synchronized void onEntityDeathEvent(EntityDeathEvent event) {
         if (event.getEntity().getKiller() != null) {
-            schedule.runTaskAsynchronously(plugin, new KillRunner(event));
+            settings.getPlugin().getServer().getScheduler().runTaskAsynchronously(settings.getPlugin(), new KillRunner(event));
         }
     }
 
@@ -116,8 +103,8 @@ public class EventListeners implements Listener {
     public void onLogin(PlayerJoinEvent event) throws IllegalArgumentException {
         Player player = event.getPlayer();
         event.setJoinMessage("");
-        new PlayerInitializer(plugin, player, thrown, manager);
-        new UpdateInvisible(plugin, player);
+        new PlayerInitializer(settings, player);
+        new UpdateInvisible(settings, player);
     }
 
     @EventHandler
@@ -125,15 +112,15 @@ public class EventListeners implements Listener {
         if (event.getWhoClicked().getOpenInventory().getTitle().equals("Server Menu:")) {
             try {
                 if (event.getCurrentItem().getType() == Material.DIAMOND_PICKAXE) {
-                    ServerWhitelist whitelist = new ServerWhitelist(plugin);
+                    ServerWhitelist whitelist = new ServerWhitelist(settings);
                     if (whitelist.getWhitelisted(event.getWhoClicked().getUniqueId().toString())) {
                         ByteArrayDataOutput out = ByteStreams.newDataOutput();
                         out.writeUTF("Connect");
                         out.writeUTF("Survival-1");
-                        ((Player) event.getWhoClicked()).sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
+                        ((Player) event.getWhoClicked()).sendPluginMessage(settings.getPlugin(), "BungeeCord", out.toByteArray());
                         ((Player) event.getWhoClicked()).sendMessage("Sending you to Survival!");
                     } else {
-                        NPCMessages messages = new NPCMessages(messageConfig, plugin, (Player) event.getWhoClicked());
+                        NPCMessages messages = new NPCMessages(settings, (Player) event.getWhoClicked());
                         if (whitelist.getBanned(event.getWhoClicked().getUniqueId().toString())) {
                             for (String s : messages.getMessages("vanilla_register")) {
                                 event.getWhoClicked().sendMessage(s);
@@ -153,7 +140,7 @@ public class EventListeners implements Listener {
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
                     out.writeUTF("Connect");
                     out.writeUTF("Zombie-1");
-                    ((Player) event.getWhoClicked()).sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
+                    ((Player) event.getWhoClicked()).sendPluginMessage(settings.getPlugin(), "BungeeCord", out.toByteArray());
                     ((Player) event.getWhoClicked()).sendMessage("Sending you to Zombie World!");
                 }
             } catch (NullPointerException e) {
@@ -232,18 +219,27 @@ public class EventListeners implements Listener {
 
     @EventHandler
     public void pickupPlayer(PlayerInteractEntityEvent event) {
-        if (npcs.containsKey(event.getRightClicked())) {
-            NPCList list = new NPCList(plugin);
-            NPCMessages npcMessages = new NPCMessages(messageConfig, plugin, event.getPlayer());
+        if (settings.getNpcs().containsKey(event.getRightClicked())) {
+            NPCList list = new NPCList(settings);
+            NPCMessages npcMessages = new NPCMessages(settings, event.getPlayer());
             ArrayList<String> messages = npcMessages.getMessages(list.getJob(event.getRightClicked()));
             for (String s : messages) {
                 event.getPlayer().sendMessage(s);
             }
             event.setCancelled(true);
         }
+        if (settings.getPetOwners().containsKey(event.getRightClicked())) {
+            if (settings.getPetOwners().get(event.getRightClicked()) != event.getPlayer()) {
+                event.getPlayer().sendMessage(ChatColor.GREEN + event.getRightClicked().getCustomName() + " isn't your pet.");
+                return;
+            }
+        }
         try {
             ArrayList<Entity> nearbyEntities = new ArrayList<>(event.getPlayer().getNearbyEntities(4, 4, 4));
-            Entity closest = nearbyEntities.get(0);
+            Entity closest = null;
+            if (nearbyEntities.size() > 0) {
+                closest = nearbyEntities.get(0);
+            }
             for (Entity e : nearbyEntities) {
                 if (event.getPlayer().hasLineOfSight(e)) {
                     if (event.getPlayer().getLocation().distance(e.getLocation()) <= 3.5) {
@@ -262,18 +258,18 @@ public class EventListeners implements Listener {
     }
 
     public void stack(Entity stackerIn, Entity stackIn) {
-        if (stackerIn == stackIn || npcs.containsKey(stackIn) || stackIn instanceof ArmorStand) {
+        if (stackerIn == stackIn || settings.getNpcs().containsKey(stackIn) || stackIn instanceof ArmorStand) {
             return;
         }
         if (stackerIn instanceof Player) {
-            PlayerPreference preferences = new Preferences(plugin).getPreferences(((Player) stackerIn).getUniqueId().toString());
+            PlayerPreference preferences = new Preferences(settings).getPreferences(((Player) stackerIn).getUniqueId().toString());
             if (!preferences.canStack()) {
                 stackerIn.sendMessage(ChatColor.GREEN + "You are not playing stacker right now.");
                 return;
             }
         }
         if (stackIn instanceof Player) {
-            PlayerPreference preferences = new Preferences(plugin).getPreferences(((Player) stackIn).getUniqueId().toString());
+            PlayerPreference preferences = new Preferences(settings).getPreferences(((Player) stackIn).getUniqueId().toString());
             if (!preferences.arePlayersVisible() || !preferences.canStack()) {
                 stackerIn.sendMessage(ChatColor.GREEN + ((Player) stackIn).getDisplayName() + " is not playing the stack game right now.");
                 return;
@@ -290,23 +286,46 @@ public class EventListeners implements Listener {
     @EventHandler
     public void playerLeave(PlayerQuitEvent event) {
         event.setQuitMessage("");
-        for (Player p : new ArrayList<>(thrown.keySet())) {
+        for (Player p : new ArrayList<>(settings.getThrown().keySet())) {
             if (p == event.getPlayer()) {
-                thrown.remove(p);
+                settings.getThrown().remove(p);
             }
+        }
+        ArrayList<Player> list = new ArrayList<>(settings.getPlayerPets().keySet());
+        if (list.contains(event.getPlayer())) {
+            settings.getPlayerPets().get(event.getPlayer()).remove();
+            settings.getPlayerPets().remove(event.getPlayer());
         }
     }
 
     @EventHandler
     public void playerMove(PlayerMoveEvent event) {
         if (event.getFrom().getYaw() != event.getTo().getYaw() || event.getFrom().getPitch() != event.getTo().getPitch()) {
-            for (Player p : thrown.keySet()) {
+            for (Player p : settings.getThrown().keySet()) {
                 if (p == event.getPlayer()) {
-                    if (thrown.get(p)) {
-                        thrown.replace(p, false);
+                    if (settings.getThrown().get(p)) {
+                        settings.getThrown().replace(p, false);
                     }
                 }
             }
         }
+    }
+
+    @EventHandler
+    public void entityPortal(EntityPortalEvent event) {
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void breakPaintings(HangingBreakEvent event) {
+        if (!event.getEntity().isOp()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void stopGrowth(BlockGrowEvent event) {
+        event.setCancelled(true);
+
     }
 }

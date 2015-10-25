@@ -2,6 +2,8 @@ package io.github.mac_genius.lobbymanager.Listeners.ListenerExtensions;
 
 import io.github.mac_genius.lobbymanager.Inventories.LobbyInventory;
 import io.github.mac_genius.lobbymanager.ScoreboardHandler.ScoreboardSetup;
+import io.github.mac_genius.lobbymanager.ServerSettings;
+import io.github.mac_genius.lobbymanager.database.PetMenu;
 import io.github.mac_genius.lobbymanager.database.Preferences;
 import io.github.mac_genius.lobbymanager.database.SQLObjects.PlayerPreference;
 import io.github.mac_genius.lobbymanager.database.ServerWhitelist;
@@ -22,16 +24,12 @@ import java.util.Scanner;
  * Created by Mac on 10/22/2015.
  */
 public class PlayerInitializer {
-    private Plugin plugin;
+    private ServerSettings settings;
     private Player player;
-    private HashMap<Player, Boolean> thrown;
-    private ScoreboardManager manager;
 
-    public PlayerInitializer(Plugin plugin, Player player, HashMap<Player, Boolean> thrown, ScoreboardManager manager) {
-        this.plugin = plugin;
+    public PlayerInitializer(ServerSettings settings, Player player) {
+        this.settings = settings;
         this.player = player;
-        this.thrown = thrown;
-        this.manager = manager;
         initializePlayer();
     }
 
@@ -50,12 +48,14 @@ public class PlayerInitializer {
     }
 
     private void addDatabase() {
-        ServerWhitelist whitelist = new ServerWhitelist(plugin);
+        ServerWhitelist whitelist = new ServerWhitelist(settings);
         whitelist.addPlayer(player);
-        Preferences preferences = new Preferences(plugin);
+        Preferences preferences = new Preferences(settings);
         preferences.addPlayer(player);
-        TokoinUpdater tokoinUpdater = new TokoinUpdater(plugin, player);
+        TokoinUpdater tokoinUpdater = new TokoinUpdater(settings, player);
         tokoinUpdater.addPlayer();
+        PetMenu menu = new PetMenu(settings);
+        menu.addMenu(player);
     }
 
     private void worldSettings() {
@@ -65,18 +65,18 @@ public class PlayerInitializer {
     }
 
     private void addCustom() {
-        thrown.put(player, false);
+        settings.getThrown().put(player, false);
     }
 
     private void scoreboard() {
-        ScoreboardSetup setup = new ScoreboardSetup(player, manager);
+        ScoreboardSetup setup = new ScoreboardSetup(player, settings);
         setup.setScoreboard();
     }
 
     private void spawn() {
         try {
-            if (plugin.getConfig().getString("coords") == null || !plugin.getConfig().getString("coords").equals("")) {
-                String coords = plugin.getConfig().getString("coords");
+            if (settings.getPlugin().getConfig().getString("coords") == null || !settings.getPlugin().getConfig().getString("coords").equals("")) {
+                String coords = settings.getPlugin().getConfig().getString("coords");
                 Scanner scan = new Scanner(coords);
                 double x = Double.parseDouble(scan.next());
                 double y = Double.parseDouble(scan.next());
@@ -92,12 +92,12 @@ public class PlayerInitializer {
                 player.teleport(new Location(player.getWorld(), x, y, z, yaw, pitch));
             }
         } catch (NullPointerException e) {
-            plugin.getLogger().warning("You're using an outdated version of the config. Please delete it and restart.");
+            settings.getPlugin().getLogger().warning("You're using an outdated version of the config. Please delete it and restart.");
         }
     }
 
     private void preferences() {
-        Preferences preferences = new Preferences(plugin);
+        Preferences preferences = new Preferences(settings);
         PlayerPreference preference = preferences.getPreferences(player.getUniqueId().toString());
         if (!preference.arePlayersVisible()) {
             ArrayList<Player> online = new ArrayList<>(Bukkit.getOnlinePlayers());

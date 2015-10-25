@@ -25,3 +25,8 @@ commands:
             usage: /sm reload
             permission: lobbymanager.reload
             permission-message: You do not have permission to do that.
+    sstop:
+                description: This will stop the server.
+                usage: /sstop
+                permission: lobbymanager.stop
+                permission-message: You do not have permission to do that.

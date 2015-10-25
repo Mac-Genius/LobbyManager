@@ -1,5 +1,6 @@
 package io.github.mac_genius.lobbymanager.Inventories.PreferenceMenus;
 
+import io.github.mac_genius.lobbymanager.ServerSettings;
 import io.github.mac_genius.lobbymanager.database.Preferences;
 import io.github.mac_genius.lobbymanager.database.SQLObjects.PlayerPreference;
 import org.bukkit.Bukkit;
@@ -23,15 +24,15 @@ import java.util.ArrayList;
  * Created by Mac on 10/22/2015.
  */
 public class PreferenceMenu implements Listener {
-    private Plugin plugin;
+    private ServerSettings settings;
     private Player player;
     private Preferences pref;
     private PlayerPreference preferences;
 
-    public PreferenceMenu(Plugin plugin, Player player) {
-        this.plugin = plugin;
+    public PreferenceMenu(ServerSettings settings, Player player) {
+        this.settings = settings;
         this.player = player;
-        pref = new Preferences(plugin);
+        pref = new Preferences(settings);
         preferences = pref.getPreferences(player.getUniqueId().toString());
         setInventory();
     }
@@ -177,7 +178,7 @@ public class PreferenceMenu implements Listener {
                 long time = player.getPlayerTime();
                 player.setPlayerTime(time + 6000, false);
                 pref.toggleTime(player.getUniqueId().toString());
-                plugin.getServer().getPluginManager().registerEvents(new PreferenceMenu(plugin, player), plugin);
+                settings.getPlugin().getServer().getPluginManager().registerEvents(new PreferenceMenu(settings, player), settings.getPlugin());
             }
             if (event.getSlot() == 12) {
                 HandlerList.unregisterAll(this);
@@ -187,7 +188,7 @@ public class PreferenceMenu implements Listener {
                     player.setPlayerWeather(WeatherType.CLEAR);
                 }
                 pref.toggleWeather(player.getUniqueId().toString());
-                plugin.getServer().getPluginManager().registerEvents(new PreferenceMenu(plugin, player), plugin);
+                settings.getPlugin().getServer().getPluginManager().registerEvents(new PreferenceMenu(settings, player), settings.getPlugin());
             }
             if (event.getSlot() == 14) {
                 HandlerList.unregisterAll(this);
@@ -207,11 +208,11 @@ public class PreferenceMenu implements Listener {
                     }
                 }
                 pref.togglePlayersVisible(player.getUniqueId().toString());
-                plugin.getServer().getPluginManager().registerEvents(new PreferenceMenu(plugin, player), plugin);
+                settings.getPlugin().getServer().getPluginManager().registerEvents(new PreferenceMenu(settings, player), settings.getPlugin());
             } if (event.getSlot() == 16) {
                 HandlerList.unregisterAll(this);
                 pref.toggleStacker(player.getUniqueId().toString());
-                plugin.getServer().getPluginManager().registerEvents(new PreferenceMenu(plugin, player), plugin);
+                settings.getPlugin().getServer().getPluginManager().registerEvents(new PreferenceMenu(settings, player), settings.getPlugin());
             }
             event.setCancelled(true);
         }

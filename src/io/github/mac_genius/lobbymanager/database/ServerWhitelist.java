@@ -1,5 +1,6 @@
 package io.github.mac_genius.lobbymanager.database;
 
+import io.github.mac_genius.lobbymanager.ServerSettings;
 import io.github.mac_genius.lobbymanager.database.SQLObjects.WhitelistResult;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -15,12 +16,12 @@ import java.util.ArrayList;
  * Created by Mac on 10/20/2015.
  */
 public class ServerWhitelist {
-    private Plugin plugin;
+    private ServerSettings settings;
     private SQLConnect connect;
 
-    public ServerWhitelist(Plugin plugin) {
-        this.plugin = plugin;
-        connect = new SQLConnect(this.plugin);
+    public ServerWhitelist(ServerSettings settings) {
+        this.settings = settings;
+        connect = new SQLConnect(settings);
     }
 
     public void addPlayer(Player player) {
@@ -52,7 +53,7 @@ public class ServerWhitelist {
             add.executeUpdate();
             connection.close();
         } catch (SQLException c) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not add the player to the whitelist." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not add the player to the whitelist." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -72,7 +73,7 @@ public class ServerWhitelist {
                 return false;
             }
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
             return false;
         }
     }
@@ -93,7 +94,7 @@ public class ServerWhitelist {
                 return false;
             }
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
             return false;
         }
     }
@@ -105,7 +106,7 @@ public class ServerWhitelist {
             register.executeUpdate();
             connection.close();
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -121,7 +122,7 @@ public class ServerWhitelist {
             connection.close();
             return status;
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
             return 0;
         }
     }
@@ -142,7 +143,7 @@ public class ServerWhitelist {
                 return false;
             }
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
             return false;
         }
     }
@@ -160,7 +161,7 @@ public class ServerWhitelist {
             connection.close();
             return waitlist;
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
             return null;
         }
     }
@@ -178,7 +179,7 @@ public class ServerWhitelist {
             connection.close();
             return whitelist;
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
             return null;
         }
     }
@@ -196,7 +197,7 @@ public class ServerWhitelist {
             connection.close();
             return banList;
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
             return null;
         }
     }

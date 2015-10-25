@@ -1,5 +1,6 @@
 package io.github.mac_genius.lobbymanager.database;
 
+import io.github.mac_genius.lobbymanager.ServerSettings;
 import io.github.mac_genius.lobbymanager.database.SQLObjects.PlayerPreference;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -14,12 +15,12 @@ import java.sql.SQLException;
  * Created by Mac on 10/22/2015.
  */
 public class Preferences {
-    private Plugin plugin;
+    private ServerSettings settings;
     private SQLConnect connect;
 
-    public Preferences(Plugin plugin) {
-        this.plugin = plugin;
-        connect = new SQLConnect(plugin);
+    public Preferences(ServerSettings settings) {
+        this.settings = settings;
+        connect = new SQLConnect(settings);
     }
 
     public void addPlayer(Player player) {
@@ -49,7 +50,7 @@ public class Preferences {
             add.executeUpdate();
             connection.close();
         } catch (SQLException c) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not add the player to the whitelist." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not add the player to the whitelist." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -69,7 +70,7 @@ public class Preferences {
             connection.close();
             return preferences;
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not add the player to the preference table." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not add the player to the preference table." + Ansi.ansi().fg(Ansi.Color.WHITE));
             return null;
         }
     }
@@ -105,7 +106,7 @@ public class Preferences {
             register.executeUpdate();
             connection.close();
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -116,7 +117,7 @@ public class Preferences {
             register.executeUpdate();
             connection.close();
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -127,7 +128,7 @@ public class Preferences {
             register.executeUpdate();
             connection.close();
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -138,7 +139,7 @@ public class Preferences {
             register.executeUpdate();
             connection.close();
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -151,7 +152,7 @@ public class Preferences {
             register.executeUpdate();
             connection.close();
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -164,7 +165,7 @@ public class Preferences {
             register.executeUpdate();
             connection.close();
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -177,7 +178,7 @@ public class Preferences {
             register.executeUpdate();
             connection.close();
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 
@@ -190,7 +191,7 @@ public class Preferences {
             register.executeUpdate();
             connection.close();
         } catch (SQLException e) {
-            plugin.getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
 }

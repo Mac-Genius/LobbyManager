@@ -1,5 +1,6 @@
 package io.github.mac_genius.lobbymanager.NPCHandler;
 
+import io.github.mac_genius.lobbymanager.ServerSettings;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
@@ -9,15 +10,15 @@ import java.util.HashMap;
  * Created by Mac on 10/21/2015.
  */
 public class StopMovement implements Runnable {
-    private HashMap<Entity, String> npcs;
+    private ServerSettings settings;
 
-    public StopMovement(HashMap<Entity, String> npcs) {
-        this.npcs = npcs;
+    public StopMovement(ServerSettings settings) {
+        this.settings = settings;
     }
 
     @Override
     public void run() {
-        for (Entity e : npcs.keySet()) {
+        for (Entity e : settings.getNpcs().keySet()) {
             Double directionX = e.getVelocity().getX() * -1;
             Double directionY = 0.0;
             Double directionZ = e.getVelocity().getZ() * -1;

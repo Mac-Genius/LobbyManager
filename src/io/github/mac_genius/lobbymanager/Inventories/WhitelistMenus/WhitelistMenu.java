@@ -1,5 +1,6 @@
 package io.github.mac_genius.lobbymanager.Inventories.WhitelistMenus;
 
+import io.github.mac_genius.lobbymanager.ServerSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -20,11 +21,11 @@ import java.util.ArrayList;
  * Created by Mac on 10/22/2015.
  */
 public class WhitelistMenu implements Listener {
-    private Plugin plugin;
+    private ServerSettings settings;
     private Player player;
 
-    public WhitelistMenu(Plugin plugin, Player player) {
-        this.plugin = plugin;
+    public WhitelistMenu(ServerSettings settings, Player player) {
+        this.settings = settings;
         this.player = player;
         setInventory();
     }
@@ -82,13 +83,13 @@ public class WhitelistMenu implements Listener {
         if (event.getWhoClicked() == player) {
             if (event.getSlot() == 3) {
                 HandlerList.unregisterAll(this);
-                plugin.getServer().getPluginManager().registerEvents(new WaitlistMenu(plugin, player), plugin);
+                settings.getPlugin().getServer().getPluginManager().registerEvents(new WaitlistMenu(settings, player), settings.getPlugin());
             } else if (event.getSlot() == 4) {
                 HandlerList.unregisterAll(this);
-                plugin.getServer().getPluginManager().registerEvents(new WhitelistedMenu(plugin, player), plugin);
+                settings.getPlugin().getServer().getPluginManager().registerEvents(new WhitelistedMenu(settings, player), settings.getPlugin());
             } else if (event.getSlot() == 5) {
                 HandlerList.unregisterAll(this);
-                plugin.getServer().getPluginManager().registerEvents(new BannedMenu(plugin, player), plugin);
+                settings.getPlugin().getServer().getPluginManager().registerEvents(new BannedMenu(settings, player), settings.getPlugin());
             }
             event.setCancelled(true);
         }

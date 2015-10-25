@@ -1,6 +1,7 @@
 package io.github.mac_genius.lobbymanager.Commands;
 
 import io.github.mac_genius.lobbymanager.NPCHandler.MessageConfig;
+import io.github.mac_genius.lobbymanager.ServerSettings;
 import io.github.mac_genius.lobbymanager.database.NPCList;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -19,16 +20,10 @@ import java.util.HashMap;
  * Created by Mac on 5/8/2015.
  */
 public class Commands implements CommandExecutor {
-    private Plugin plugin;
-    private MessageConfig messageConfig;
-    private HashMap<Entity, String> npcs;
-    private HashMap<Entity, ArrayList<ArmorStand>> npcTags;
+    private ServerSettings settings;
 
-    public Commands(Plugin pluginin, MessageConfig messageConfig, HashMap<Entity, String> npcs, HashMap<Entity, ArrayList<ArmorStand>> npcTags) {
-        plugin = pluginin;
-        this.messageConfig = messageConfig;
-        this.npcs = npcs;
-        this.npcTags = npcTags;
+    public Commands(ServerSettings settings) {
+        this.settings = settings;
     }
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
@@ -46,8 +41,8 @@ public class Commands implements CommandExecutor {
                     return true;
                 }
                 if (strings[0].equalsIgnoreCase("reload") && commandSender.hasPermission("sm.reload")) {
-                    plugin.reloadConfig();
-                    messageConfig.reloadConfig();
+                    settings.getPlugin().reloadConfig();
+                    settings.getMessageConfig().reloadConfig();
                     commandSender.sendMessage(ChatColor.GREEN + "[LobbyManager] " + ChatColor.WHITE + "Config reloaded!");
                     return true;
                 }
@@ -134,10 +129,10 @@ public class Commands implements CommandExecutor {
                             stands.add(title);
                             stands.add(rightClick);
                         }
-                        NPCList list = new NPCList(plugin);
+                        NPCList list = new NPCList(settings);
                         list.addNPC(entity, job);
-                        npcs.put(entity, job);
-                        npcTags.put(entity, stands);
+                        settings.getNpcs().put(entity, job);
+                        settings.getNPCTags().put(entity, stands);
                         if (entity instanceof LivingEntity) {
                             PotionEffect slowness = new PotionEffect(PotionEffectType.SLOW, 1000000000, 100, false, false);
                             ((LivingEntity) entity).addPotionEffect(slowness);
@@ -148,17 +143,17 @@ public class Commands implements CommandExecutor {
                     return true;
                 }
                 if (strings[0].equalsIgnoreCase("npcd")) {
-                    NPCList list = new NPCList(plugin);
+                    NPCList list = new NPCList(settings);
                     ArrayList<Entity> nearby = new ArrayList<>(player.getNearbyEntities(3, 3, 3));
                     for (Entity e : nearby) {
                         if (player.hasLineOfSight(e)) {
                             if (!(e instanceof ArmorStand)) {
-                                for (ArmorStand armor : npcTags.get(e)) {
+                                for (ArmorStand armor : settings.getNPCTags().get(e)) {
                                     armor.remove();
                                 }
-                                npcTags.remove(e);
+                                settings.getNPCTags().remove(e);
                                 list.removeNPC(e);
-                                npcs.remove(e);
+                                settings.getNpcs().remove(e);
                                 e.remove();
                                 player.sendMessage(ChatColor.GREEN + "The entity has been successfully removed.");
                                 break;
@@ -176,20 +171,20 @@ public class Commands implements CommandExecutor {
                             player.sendMessage(ChatColor.RED + "Please type a job or make sure it is less than 20 characters.");
                             return true;
                         }
-                        NPCList list = new NPCList(plugin);
+                        NPCList list = new NPCList(settings);
                         ArrayList<Entity> nearby = new ArrayList<>(player.getNearbyEntities(3, 3, 3));
                         for (Entity e : nearby) {
                             if (player.hasLineOfSight(e)) {
                                 if (!(e instanceof ArmorStand)) {
                                     list.setJob(e, job);
-                                    npcs.put(e, job);
+                                    settings.getNpcs().put(e, job);
                                     player.sendMessage(ChatColor.GREEN + "The entity's job has been successfully updated.");
                                     break;
                                 }
                             }
                         }
                     } else if (strings[1].equalsIgnoreCase("fetch")) {
-                        NPCList list = new NPCList(plugin);
+                        NPCList list = new NPCList(settings);
                         ArrayList<Entity> nearby = new ArrayList<>(player.getNearbyEntities(3, 3, 3));
                         for (Entity e : nearby) {
                             if (player.hasLineOfSight(e)) {

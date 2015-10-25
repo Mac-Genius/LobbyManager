@@ -20,14 +20,10 @@ import java.util.Scanner;
  * Created by Mac on 5/21/2015.
  */
 public class ServerPortals implements Runnable {
-    private Plugin plugin;
-    private HashMap<Player, Boolean> thrown;
-    private MessageConfig messageConfig;
+    private ServerSettings settings;
 
-    public ServerPortals(Plugin pluginIn, HashMap<Player, Boolean> thrownIn, MessageConfig messageConfig) {
-        plugin = pluginIn;
-        thrown = thrownIn;
-        this.messageConfig = messageConfig;
+    public ServerPortals(ServerSettings settings) {
+        this.settings = settings;
     }
 
     @Override
@@ -42,9 +38,9 @@ public class ServerPortals implements Runnable {
             if (p.getLocation().getX() <= -219.0 && p.getLocation().getX() >= -219.9 && p.getLocation().getZ() >= -1243.5 && p.getLocation().getZ() <= -1240.3 && p.getLocation().getY() >= 112.0 && p.getLocation().getY() <= 115.0) {
                 if (p.isInsideVehicle()) {
                     try {
-                        if (plugin.getConfig().getString("coords") == null || !plugin.getConfig().getString("coords").equals("")) {
+                        if (settings.getPlugin().getConfig().getString("coords") == null || !settings.getPlugin().getConfig().getString("coords").equals("")) {
                             p.getVehicle().eject();
-                            String coords = plugin.getConfig().getString("coords");
+                            String coords = settings.getPlugin().getConfig().getString("coords");
                             Scanner scan = new Scanner(coords);
                             double x = Double.parseDouble(scan.next());
                             double y = Double.parseDouble(scan.next());
@@ -61,11 +57,11 @@ public class ServerPortals implements Runnable {
                             return;
                         }
                     } catch (NullPointerException e) {
-                        plugin.getLogger().warning("You're using an outdated version of the config. Please delete it and restart.");
+                        settings.getPlugin().getLogger().warning("You're using an outdated version of the config. Please delete it and restart.");
                         return;
                     }
                 }
-                if (thrown.get(p)) {
+                if (settings.getThrown().get(p)) {
                     Vector v = p.getVelocity();
                     v.setX(1);
                     v.setY(.5);
@@ -76,21 +72,21 @@ public class ServerPortals implements Runnable {
                 ByteArrayDataOutput out = ByteStreams.newDataOutput();
                 out.writeUTF("Connect");
                 out.writeUTF("Zombie-1");
-                p.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
+                p.sendPluginMessage(settings.getPlugin(), "BungeeCord", out.toByteArray());
                 p.sendMessage("Sending you to Zombie World!");
                 teleported = true;
             }
 
             // Connect to Survival
-            ServerWhitelist whitelist = new ServerWhitelist(plugin);
+            ServerWhitelist whitelist = new ServerWhitelist(settings);
 
                 if (p.getLocation().getX() <= -163.5 && p.getLocation().getX() >= -168.5 && p.getLocation().getZ() >= -1188.0 && p.getLocation().getZ() <= -1187.0 && p.getLocation().getY() >= 112.0 && p.getLocation().getY() <= 115.0) {
                     if (whitelist.getWhitelisted(p.getUniqueId().toString())) {
                         if (p.isInsideVehicle()) {
                             try {
-                                if (plugin.getConfig().getString("coords") == null || !plugin.getConfig().getString("coords").equals("")) {
+                                if (settings.getPlugin().getConfig().getString("coords") == null || !settings.getPlugin().getConfig().getString("coords").equals("")) {
                                     p.getVehicle().eject();
-                                    String coords = plugin.getConfig().getString("coords");
+                                    String coords = settings.getPlugin().getConfig().getString("coords");
                                     Scanner scan = new Scanner(coords);
                                     double x = Double.parseDouble(scan.next());
                                     double y = Double.parseDouble(scan.next());
@@ -107,11 +103,11 @@ public class ServerPortals implements Runnable {
                                     return;
                                 }
                             } catch (NullPointerException e) {
-                                plugin.getLogger().warning("You're using an outdated version of the config. Please delete it and restart.");
+                                settings.getPlugin().getLogger().warning("You're using an outdated version of the config. Please delete it and restart.");
                                 return;
                             }
                         }
-                        if (thrown.get(p)) {
+                        if (settings.getThrown().get(p)) {
                             Vector v = p.getVelocity();
                             v.setX(0);
                             v.setY(1);
@@ -122,7 +118,7 @@ public class ServerPortals implements Runnable {
                         ByteArrayDataOutput out = ByteStreams.newDataOutput();
                         out.writeUTF("Connect");
                         out.writeUTF("Survival-1");
-                        p.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
+                        p.sendPluginMessage(settings.getPlugin(), "BungeeCord", out.toByteArray());
                         p.sendMessage("Sending you to Survival!");
                         teleported = true;
                     } else {
@@ -131,7 +127,7 @@ public class ServerPortals implements Runnable {
                         v.setY(1);
                         v.setZ(-2);
                         p.setVelocity(v);
-                        NPCMessages messages = new NPCMessages(messageConfig, plugin, p);
+                        NPCMessages messages = new NPCMessages(settings, p);
                         if (whitelist.getBanned(p.getUniqueId().toString())) {
                             for (String s : messages.getMessages("vanilla_register")) {
                                 p.sendMessage(s);
@@ -154,9 +150,9 @@ public class ServerPortals implements Runnable {
 
                 if (p.isInsideVehicle()) {
                     try {
-                        if (plugin.getConfig().getString("coords") == null || !plugin.getConfig().getString("coords").equals("")) {
+                        if (settings.getPlugin().getConfig().getString("coords") == null || !settings.getPlugin().getConfig().getString("coords").equals("")) {
                             p.getVehicle().eject();
-                            String coords = plugin.getConfig().getString("coords");
+                            String coords = settings.getPlugin().getConfig().getString("coords");
                             Scanner scan = new Scanner(coords);
                             double x = Double.parseDouble(scan.next());
                             double y = Double.parseDouble(scan.next());
@@ -173,11 +169,11 @@ public class ServerPortals implements Runnable {
                             return;
                         }
                     } catch (NullPointerException e) {
-                        plugin.getLogger().warning("You're using an outdated version of the config. Please delete it and restart.");
+                        settings.getPlugin().getLogger().warning("You're using an outdated version of the config. Please delete it and restart.");
                         return;
                     }
                 }
-                if (thrown.get(p)) {
+                if (settings.getThrown().get(p)) {
                     Vector v = p.getVelocity();
                     v.setX(-1);
                     v.setY(.5);
@@ -188,7 +184,7 @@ public class ServerPortals implements Runnable {
                 ByteArrayDataOutput out = ByteStreams.newDataOutput();
                 out.writeUTF("Connect");
                 out.writeUTF("SG-1");
-                p.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
+                p.sendPluginMessage(settings.getPlugin(), "BungeeCord", out.toByteArray());
                 p.sendMessage("Sending you to Survival Games!");
                 teleported = true;
             }
