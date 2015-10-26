@@ -43,8 +43,8 @@ public class StoreMenu implements Listener {
         store.setItem(12, getGadgetIcon());
         store.setItem(14, getPetIcon());
         player.openInventory(store);
-        //BukkitTask  fancyShop = settings.getPlugin().getServer().getScheduler().runTaskTimer(settings.getPlugin(), new FancyShop(), 0, 2);
-        //fancyshopID = fancyShop.getTaskId();
+        BukkitTask  fancyShop = settings.getPlugin().getServer().getScheduler().runTaskTimer(settings.getPlugin(), new FancyShop(), 0, 2);
+        fancyshopID = fancyShop.getTaskId();
     }
 
     private ItemStack[] setBorder() {
@@ -145,6 +145,31 @@ public class StoreMenu implements Listener {
     }
 
     private void updateRainbowBorder() {
-
+        if (player.getOpenInventory().getTopInventory() != null) {
+            for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
+                try {
+                    if (i != 12 && i != 14) {
+                        if (player.getOpenInventory().getTopInventory().getItem(i) != null) {
+                            if (player.getOpenInventory().getTopInventory().getItem(i).getDurability() == (byte) 14) {
+                                player.getOpenInventory().getTopInventory().setItem(i, makeItem(Material.STAINED_GLASS_PANE, ChatColor.GREEN + "", new ArrayList<>(), (byte) 6));
+                            } else if (player.getOpenInventory().getTopInventory().getItem(i).getDurability() == (byte) 1) {
+                                player.getOpenInventory().getTopInventory().setItem(i, makeItem(Material.STAINED_GLASS_PANE, ChatColor.GREEN + "", new ArrayList<>(), (byte) 14));
+                            } else if (player.getOpenInventory().getTopInventory().getItem(i).getDurability() == (byte) 4) {
+                                player.getOpenInventory().getTopInventory().setItem(i, makeItem(Material.STAINED_GLASS_PANE, ChatColor.GREEN + "", new ArrayList<>(), (byte) 1));
+                            } else if (player.getOpenInventory().getTopInventory().getItem(i).getDurability() == (byte) 5) {
+                                player.getOpenInventory().getTopInventory().setItem(i, makeItem(Material.STAINED_GLASS_PANE, ChatColor.GREEN + "", new ArrayList<>(), (byte) 4));
+                            } else if (player.getOpenInventory().getTopInventory().getItem(i).getDurability() == (byte) 3) {
+                                player.getOpenInventory().getTopInventory().setItem(i, makeItem(Material.STAINED_GLASS_PANE, ChatColor.GREEN + "", new ArrayList<>(), (byte) 5));
+                            } else if (player.getOpenInventory().getTopInventory().getItem(i).getDurability() == (byte) 2) {
+                                player.getOpenInventory().getTopInventory().setItem(i, makeItem(Material.STAINED_GLASS_PANE, ChatColor.GREEN + "", new ArrayList<>(), (byte) 3));
+                            } else if (player.getOpenInventory().getTopInventory().getItem(i).getDurability() == (byte) 6) {
+                                player.getOpenInventory().getTopInventory().setItem(i, makeItem(Material.STAINED_GLASS_PANE, ChatColor.GREEN + "", new ArrayList<>(), (byte) 2));
+                            }
+                        }
+                    }
+                } catch (NullPointerException e) {
+                }
+            }
+        }
     }
 }

@@ -36,8 +36,8 @@ public class PetMenu implements Listener {
         this.player = player;
         petStore = new io.github.mac_genius.lobbymanager.database.PetMenu(settings).getMenu(player.getUniqueId().toString());
         setInventory();
-        //BukkitTask fancyShop = settings.getPlugin().getServer().getScheduler().runTaskTimer(settings.getPlugin(), new FancyShop(), 0, 2);
-        //fancyshopID = fancyShop.getTaskId();
+        BukkitTask fancyShop = settings.getPlugin().getServer().getScheduler().runTaskTimer(settings.getPlugin(), new FancyShop(), 0, 2);
+        fancyshopID = fancyShop.getTaskId();
     }
 
     private void setInventory() {

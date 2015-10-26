@@ -47,6 +47,12 @@ public class SecondaryThread implements Runnable {
     }
 
     private void outOfBounds(Player player) {
+        if (settings.getParkour().get(player).isInParkour()) {
+            if (settings.getParkour().get(player).getCheckpointLoc().getY() - player.getLocation().getY() > 5) {
+                player.teleport(settings.getParkour().get(player).getCheckpointLoc());
+                settings.getParkour().get(player).incrementFails();
+            }
+        }
         if (player.getLocation().getY() < 0) {
             String coords = settings.getPlugin().getConfig().getString("coords");
             Scanner scan = new Scanner(coords);
@@ -69,7 +75,7 @@ public class SecondaryThread implements Runnable {
         Location block = player.getLocation();
         block.setY(block.getBlockY() - 1);
         Block test = block.getBlock();
-        if (test.getType() != Material.AIR) {
+        if (test.getType() != Material.AIR && !settings.getParkour().get(player).isInParkour()) {
             player.setAllowFlight(true);
         }
     }

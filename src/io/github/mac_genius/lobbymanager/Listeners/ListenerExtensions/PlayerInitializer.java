@@ -1,6 +1,7 @@
 package io.github.mac_genius.lobbymanager.Listeners.ListenerExtensions;
 
 import io.github.mac_genius.lobbymanager.Inventories.LobbyInventory;
+import io.github.mac_genius.lobbymanager.Parkour.PlayerParkour;
 import io.github.mac_genius.lobbymanager.ScoreboardHandler.ScoreboardSetup;
 import io.github.mac_genius.lobbymanager.ServerSettings;
 import io.github.mac_genius.lobbymanager.database.PetMenu;
@@ -65,6 +66,8 @@ public class PlayerInitializer {
     }
 
     private void addCustom() {
+        PlayerParkour parkour = new PlayerParkour(settings, player);
+        settings.getParkour().put(player, parkour);
         settings.getThrown().put(player, false);
     }
 

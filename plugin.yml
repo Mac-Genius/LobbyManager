@@ -2,18 +2,31 @@ name: LobbyManager
 main: io.github.mac_genius.lobbymanager.LobbyManager
 version: 1.0
 permissions:
-    scoreboardmaster.*:
+    lobbymanager.*:
         description: Gives access to all commands for the plugin
         children:
-            scoreboardmaster.reload: true
-            scoreboardmaster.help: true
+            lobbymanager.reload: true
+            lobbymanager.help: true
+            lobbymanager.stop: true
+            lobbymanager.parkour: true
+            lobbymanager.createtext: true
 
-    scoreboardmaster.reload:
+    lobbymanager.reload:
         description: Allows a player to reload the config
         default: op
-    scoreboardmaster.help:
+    lobbymanager.help:
         description: Brings up the commands
         default: op
+    lobbymanager.stop:
+        description: Stops the server safely
+        default: op
+    lobbymanager.parkour:
+        description: Allows players to interact with parkour
+        default: true
+    lobbymanager.createtext:
+        description: Allows players to create text
+        default: op
+
 commands:
     sm:
         description: This is the help command.
@@ -21,12 +34,22 @@ commands:
         permission: lobbymanager.help
         permission-message: You do not have permission to do that.
     sm reload:
-            description: This will reload the plugin.
-            usage: /sm reload
-            permission: lobbymanager.reload
-            permission-message: You do not have permission to do that.
+        description: This will reload the plugin.
+        usage: /sm reload
+        permission: lobbymanager.reload
+        permission-message: You do not have permission to do that.
     sstop:
-                description: This will stop the server.
-                usage: /sstop
-                permission: lobbymanager.stop
-                permission-message: You do not have permission to do that.
+        description: This will stop the server.
+        usage: /sstop
+        permission: lobbymanager.stop
+        permission-message: You do not have permission to do that.
+    parkour:
+        description: Deals with parkour.
+        usage: /parkour <reset/quit>
+        permission: lobbymanager.parkour
+        permission-message: You do not have permission to do that.
+    holotext:
+        description: Allows player to create text.
+        usage: /holotext
+        permission: lobbymanager.createtext
+        permission-message: You do not have permission to do that.

@@ -66,6 +66,13 @@ public class SQLConnect {
                 settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not create the Pets table." + Ansi.ansi().fg(Ansi.Color.WHITE));
             }
             try {
+                PreparedStatement preferences = connection.prepareStatement("CREATE TABLE IF NOT EXISTS ParkourCourses(Id INT PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(25), Checkpoints INT, Difficulty VARCHAR(15) NOT NULL, StartX DOUBLE, StartY DOUBLE, StartZ DOUBLE, FinishX DOUBLE, FinishY DOUBLE, FinishZ DOUBLE)");
+                preferences.executeUpdate();
+                preferences.close();
+            } catch (SQLException e) {
+                settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not create the Pets table." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            }
+            try {
                 connection.close();
             } catch (SQLException e) {
                 settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not close the connection." + Ansi.ansi().fg(Ansi.Color.WHITE));

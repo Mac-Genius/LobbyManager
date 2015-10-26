@@ -1,7 +1,10 @@
 package io.github.mac_genius.lobbymanager;
 
 import io.github.mac_genius.lobbymanager.NPCHandler.MessageConfig;
+import io.github.mac_genius.lobbymanager.Parkour.ParkourCourse;
+import io.github.mac_genius.lobbymanager.Parkour.PlayerParkour;
 import io.github.mac_genius.lobbymanager.database.NPCList;
+import io.github.mac_genius.lobbymanager.database.ParkourCourses;
 import io.github.mac_genius.lobbymanager.database.SQLConnect;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.ArmorStand;
@@ -27,6 +30,8 @@ public class ServerSettings {
     private Map<Entity, ArrayList<ArmorStand>> npcTags;
     private Map<Player, Entity> playerPets;
     private Map<Entity, Player> petOwners;
+    private Map<Player, PlayerParkour> parkour;
+    private ArrayList<ParkourCourse> courses;
     private MessageConfig messageConfig;
     private ScoreboardManager manager;
     private BukkitScheduler taskSchedule;
@@ -44,6 +49,8 @@ public class ServerSettings {
         setupSQL();
         setupNPC();
         setupPets();
+        setupParkour();
+        setupCourses();
     }
 
     private void setupPlugin() {
@@ -110,6 +117,15 @@ public class ServerSettings {
         return output;
     }
 
+    public void setupParkour() {
+        parkour = Collections.synchronizedMap(new HashMap<>());
+    }
+
+    public void setupCourses() {
+        ParkourCourses courses = new ParkourCourses(this);
+        this.courses = courses.getCourses();
+    }
+
     public Map<Entity, Player> getPetOwners() {
         return petOwners;
     }
@@ -160,5 +176,13 @@ public class ServerSettings {
 
     public Map<Entity, ArrayList<ArmorStand>> getNPCTags() {
         return npcTags;
+    }
+
+    public ArrayList<ParkourCourse> getCourses() {
+        return courses;
+    }
+
+    public Map<Player, PlayerParkour> getParkour() {
+        return parkour;
     }
 }

@@ -36,8 +36,8 @@ public class BoneMenu implements Listener {
         this.player = player;
         petStore = new io.github.mac_genius.lobbymanager.database.PetMenu(settings).getMenu(player.getUniqueId().toString());
         setInventory();
-        //BukkitTask fancyShop = settings.getPlugin().getServer().getScheduler().runTaskTimer(settings.getPlugin(), new FancyShop(), 0, 2);
-        //fancyshopID = fancyShop.getTaskId();
+        BukkitTask fancyShop = settings.getPlugin().getServer().getScheduler().runTaskTimer(settings.getPlugin(), new FancyShop(), 0, 2);
+        fancyshopID = fancyShop.getTaskId();
     }
 
     private void setInventory() {
@@ -91,7 +91,7 @@ public class BoneMenu implements Listener {
         String name = ChatColor.LIGHT_PURPLE + "De-equip pet";
         ArrayList<String> lore = new ArrayList<>();
         lore.add(ChatColor.WHITE + "Left-click to remove pet.");
-        return makeItem(Material.REDSTONE, name, lore, (byte) 14);
+        return makeItem(Material.REDSTONE, name, lore, (byte) 0);
     }
 
     private ItemStack rename() {

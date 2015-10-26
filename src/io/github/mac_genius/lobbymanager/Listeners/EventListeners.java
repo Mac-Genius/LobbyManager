@@ -12,6 +12,7 @@ import io.github.mac_genius.lobbymanager.Listeners.ListenerExtensions.PlayerInit
 import io.github.mac_genius.lobbymanager.Listeners.ListenerExtensions.UpdateInvisible;
 import io.github.mac_genius.lobbymanager.NPCHandler.MessageConfig;
 import io.github.mac_genius.lobbymanager.NPCHandler.NPCMessages;
+import io.github.mac_genius.lobbymanager.Parkour.ParkourCourse;
 import io.github.mac_genius.lobbymanager.ScoreboardHandler.ScoreboardSetup;
 import io.github.mac_genius.lobbymanager.ServerSettings;
 import io.github.mac_genius.lobbymanager.database.NPCList;
@@ -20,15 +21,13 @@ import io.github.mac_genius.lobbymanager.database.SQLObjects.PlayerPreference;
 import io.github.mac_genius.lobbymanager.database.ServerWhitelist;
 import io.github.mac_genius.lobbymanager.database.TokoinUpdater;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockGrowEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
@@ -63,8 +62,26 @@ public class EventListeners implements Listener {
             if (player.getPassenger() != null && event.getAction() == Action.LEFT_CLICK_AIR) {
                 throwEntity(event.getPlayer(), event.getPlayer().getPassenger());
             }
+            if (event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.IRON_PLATE) {
+                if (settings.getParkour().get(player).isInParkour()) {
+                    if (event.getClickedBlock().equals(settings.getParkour().get(player).getCourse().getFinish())) {
+                        settings.getParkour().get(player).finishParkour();
+                    }
+                    else if (!event.getClickedBlock().equals(settings.getParkour().get(player).getCheckpointLoc().getBlock())) {
+                        settings.getParkour().get(player).updateCheckpoint(event.getClickedBlock().getLocation());
+                    }
+                } else {
+                    for (ParkourCourse course : settings.getCourses()) {
+                        if (course.getStart().equals(event.getClickedBlock())) {
+                            settings.getParkour().get(player).startParkour(course);
+                            break;
+                        }
+                    }
+                }
+            }
         } catch (NullPointerException e) {
             settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Error with PlayerInteractEvent." + Ansi.ansi().fg(Ansi.Color.WHITE));
+            e.printStackTrace();
         }
     }
 
@@ -326,6 +343,5 @@ public class EventListeners implements Listener {
     @EventHandler
     public void stopGrowth(BlockGrowEvent event) {
         event.setCancelled(true);
-
     }
 }
