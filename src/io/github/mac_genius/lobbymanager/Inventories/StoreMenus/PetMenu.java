@@ -260,7 +260,7 @@ public class PetMenu implements Listener {
             pet.addPet(player, type);
             tokoins.addTokoins(-1*price);
             io.github.mac_genius.lobbymanager.database.PetMenu menu = new io.github.mac_genius.lobbymanager.database.PetMenu(settings);
-            menu.unlockSheep(player.getUniqueId().toString());
+            menu.unlockPet(player.getUniqueId().toString(), display);
             Entity entity = spawnPet(type, "", true);
             settings.getPlayerPets().put(player, entity);
             settings.getPetOwners().put(entity, player);

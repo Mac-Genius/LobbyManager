@@ -1,4 +1,4 @@
-package io.github.mac_genius.lobbymanager;
+package io.github.mac_genius.lobbymanager.SecondaryThreads.Runnables;
 
 import org.bukkit.entity.Entity;
 

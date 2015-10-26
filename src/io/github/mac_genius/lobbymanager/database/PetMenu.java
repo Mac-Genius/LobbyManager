@@ -142,4 +142,15 @@ public class PetMenu {
             settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
     }
+
+    public void unlockPet(String uuid, String pet) {
+        Connection connection = connect.getConnection();
+        try {
+            PreparedStatement register = connection.prepareStatement("UPDATE PetMenu SET " + pet + "='1' WHERE Uuid='" + uuid + "'");
+            register.executeUpdate();
+            connection.close();
+        } catch (SQLException e) {
+            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not update the player." + Ansi.ansi().fg(Ansi.Color.WHITE));
+        }
+    }
 }

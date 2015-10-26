@@ -1,9 +1,10 @@
-package io.github.mac_genius.lobbymanager;
+package io.github.mac_genius.lobbymanager.SecondaryThreads.Runnables;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import io.github.mac_genius.lobbymanager.NPCHandler.MessageConfig;
 import io.github.mac_genius.lobbymanager.NPCHandler.NPCMessages;
+import io.github.mac_genius.lobbymanager.ServerSettings;
 import io.github.mac_genius.lobbymanager.database.ServerWhitelist;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
