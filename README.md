@@ -20,4 +20,4 @@ Stores player information on a MySQL server so that it can be retreived on diffe
 
 4. Change offline UUIDs to online UUIDs
 
-5. Create parkour controller
+5. ~~Create parkour controller~~ *Finished 10/25*
