@@ -10,6 +10,7 @@ permissions:
             lobbymanager.stop: true
             lobbymanager.parkour: true
             lobbymanager.createtext: true
+            lobbymanager.whitelist: true
 
     lobbymanager.reload:
         description: Allows a player to reload the config
@@ -25,6 +26,9 @@ permissions:
         default: true
     lobbymanager.createtext:
         description: Allows players to create text
+        default: op
+    lobbymanager.whitelist:
+        description: Allows players to manage the whitelist
         default: op
 
 commands:

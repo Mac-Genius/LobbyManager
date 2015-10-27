@@ -25,7 +25,7 @@ public class LobbyInventory {
         player.getInventory().clear();
         player.getInventory().setHeldItemSlot(0);
         player.getInventory().setItem(0, getServerIcon());
-        if (player.isOp()) {
+        if (player.hasPermission("lobbymanager.whitelist")) {
             player.getInventory().setItem(1, getWhitelistIcon());
         }
         //player.getInventory().setItem(3, getGadgetIcon());

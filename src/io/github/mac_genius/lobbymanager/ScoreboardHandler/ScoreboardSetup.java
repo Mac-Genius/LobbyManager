@@ -25,7 +25,7 @@ public class ScoreboardSetup {
         player.setScoreboard(scoreboard);
         Objective o = scoreboard.registerNewObjective("1", "dummy");
         o.setDisplaySlot(DisplaySlot.SIDEBAR);
-        o.setDisplayName(" " + ChatColor.BOLD + "Welcome " + player.getDisplayName() + "!" + " ");
+        o.setDisplayName(" " + ChatColor.BOLD + "Welcome!" + " ");
         o.getScore(ChatColor.BLACK + "").setScore(8);
         o.getScore(ChatColor.RED + "" + ChatColor.BOLD + "Server").setScore(7);
         o.getScore(Bukkit.getServerName()).setScore(6);

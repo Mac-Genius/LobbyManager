@@ -23,7 +23,7 @@ public class SafeStop implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-        if (commandSender instanceof ConsoleCommandSender || commandSender.isOp()) {
+        if (commandSender instanceof ConsoleCommandSender || commandSender.hasPermission("lobbymanager.stop")) {
             if (command.getName().equalsIgnoreCase("sstop")) {
                 settings.getPlugin().getServer().broadcastMessage(ChatColor.BLUE + "[Announcement] " + ChatColor.WHITE + "The server will be restarting in 30 seconds.");
                 settings.getPlugin().getServer().getScheduler().runTaskLater(settings.getPlugin(), new ShutdownRunnable(settings), 600);

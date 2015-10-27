@@ -58,8 +58,7 @@ public class EventListeners implements Listener {
                 if (settings.getParkour().get(player).isInParkour()) {
                     if (event.getClickedBlock().equals(settings.getParkour().get(player).getCourse().getFinish())) {
                         settings.getParkour().get(player).finishParkour();
-                    }
-                    else if (!event.getClickedBlock().equals(settings.getParkour().get(player).getCheckpointLoc().getBlock())) {
+                    } else if (!event.getClickedBlock().equals(settings.getParkour().get(player).getCheckpointLoc().getBlock())) {
                         settings.getParkour().get(player).updateCheckpoint(event.getClickedBlock().getLocation());
                     }
                 } else {

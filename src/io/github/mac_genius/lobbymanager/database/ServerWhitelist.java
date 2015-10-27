@@ -49,7 +49,7 @@ public class ServerWhitelist {
             PreparedStatement add = connection.prepareStatement("INSERT INTO Whitelist(Uuid, Registered, Username) VALUES(?, ?, ?)");
             add.setString(1, player.getUniqueId().toString());
             add.setInt(2, 0);
-            add.setString(3, player.getDisplayName());
+            add.setString(3, player.getName());
             add.executeUpdate();
             connection.close();
         } catch (SQLException c) {

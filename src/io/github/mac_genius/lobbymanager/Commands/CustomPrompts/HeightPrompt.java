@@ -17,7 +17,7 @@ public class HeightPrompt extends NumericPrompt {
 
     @Override
     protected Prompt acceptValidatedInput(ConversationContext conversationContext, Number number) {
-        text.setHeight(number.doubleValue() + 2);
+        text.setHeight(number.doubleValue());
         return new TextPrompt(text);
     }
 

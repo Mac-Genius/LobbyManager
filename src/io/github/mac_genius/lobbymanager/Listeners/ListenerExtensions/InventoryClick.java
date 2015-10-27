@@ -28,7 +28,7 @@ public class InventoryClick {
             if (player.getInventory().getHeldItemSlot() == 0) {
                 CompassInventory compassInventory = new CompassInventory(settings, player);
                 player.openInventory(compassInventory.getInventory(player));
-            } else if (player.isOp() && player.getInventory().getHeldItemSlot() == 1) {
+            } else if (player.hasPermission("lobbymanager.whitelist") && player.getInventory().getHeldItemSlot() == 1) {
                 settings.getPlugin().getServer().getPluginManager().registerEvents(new WhitelistMenu(settings, player), settings.getPlugin());
             } else if (player.getInventory().getHeldItemSlot() == 8) {
                 settings.getPlugin().getServer().getPluginManager().registerEvents(new PreferenceMenu(settings, player), settings.getPlugin());

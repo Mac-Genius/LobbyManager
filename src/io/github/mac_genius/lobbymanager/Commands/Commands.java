@@ -30,7 +30,7 @@ public class Commands implements CommandExecutor {
         if (commandSender instanceof Player) {
             Player player = (Player) commandSender;
             if (command.getName().equalsIgnoreCase("sm")) {
-                if (strings.length == 0 && commandSender.hasPermission("sm.help")) {
+                if (strings.length == 0 && commandSender.hasPermission("lobbymanager.help")) {
                     commandSender.sendMessage(ChatColor.GREEN + "---------- LobbyManager Help ----------");
                     commandSender.sendMessage(ChatColor.GOLD + "/sm reload" + ChatColor.WHITE + " reloads the config");
                     commandSender.sendMessage(ChatColor.GOLD + "/sm help" + ChatColor.WHITE + " commands");
@@ -40,7 +40,7 @@ public class Commands implements CommandExecutor {
                     commandSender.sendMessage(ChatColor.GOLD + "/sm npcj [update/fetch] <job>" + ChatColor.WHITE + " Updates a npc's job or fetches their job.");
                     return true;
                 }
-                if (strings[0].equalsIgnoreCase("reload") && commandSender.hasPermission("sm.reload")) {
+                if (strings[0].equalsIgnoreCase("reload") && commandSender.hasPermission("lobbymanager.reload")) {
                     settings.getPlugin().reloadConfig();
                     settings.getMessageConfig().reloadConfig();
                     commandSender.sendMessage(ChatColor.GREEN + "[LobbyManager] " + ChatColor.WHITE + "Config reloaded!");

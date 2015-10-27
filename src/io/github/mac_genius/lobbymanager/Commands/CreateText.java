@@ -27,7 +27,7 @@ public class CreateText implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if (command.getName().equalsIgnoreCase("holotext")) {
-            if (commandSender instanceof Player) {
+            if (commandSender instanceof Player && commandSender.hasPermission("lobbymanager.createtext")) {
                 HoloText text = new HoloText((Player)commandSender);
                 ConversationFactory factory = new ConversationFactory(settings.getPlugin());
                 Conversation conversation = factory.withFirstPrompt(new SizePrompt(text)).withLocalEcho(true).buildConversation((Player) commandSender);
