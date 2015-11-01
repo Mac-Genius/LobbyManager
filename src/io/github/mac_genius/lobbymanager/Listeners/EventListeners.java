@@ -13,12 +13,13 @@ import io.github.mac_genius.lobbymanager.database.NPCList;
 import io.github.mac_genius.lobbymanager.database.Preferences;
 import io.github.mac_genius.lobbymanager.database.SQLObjects.PlayerPreference;
 import io.github.mac_genius.lobbymanager.database.ServerWhitelist;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import net.minecraft.server.v1_8_R3.EnumParticle;
+import net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles;
+import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -126,7 +127,7 @@ public class EventListeners implements Listener {
                         out.writeUTF("Connect");
                         out.writeUTF("Survival-1");
                         ((Player) event.getWhoClicked()).sendPluginMessage(settings.getPlugin(), "BungeeCord", out.toByteArray());
-                        ((Player) event.getWhoClicked()).sendMessage("Sending you to Survival!");
+                        event.getWhoClicked().sendMessage("Sending you to Survival!");
                     } else {
                         NPCMessages messages = new NPCMessages(settings, (Player) event.getWhoClicked());
                         if (whitelist.getBanned(event.getWhoClicked().getUniqueId().toString())) {
@@ -149,7 +150,7 @@ public class EventListeners implements Listener {
                     out.writeUTF("Connect");
                     out.writeUTF("Zombie-1");
                     ((Player) event.getWhoClicked()).sendPluginMessage(settings.getPlugin(), "BungeeCord", out.toByteArray());
-                    ((Player) event.getWhoClicked()).sendMessage("Sending you to Zombie World!");
+                    event.getWhoClicked().sendMessage("Sending you to Zombie World!");
                 }
             } catch (NullPointerException e) {
                 event.setCancelled(true);
@@ -157,7 +158,7 @@ public class EventListeners implements Listener {
             event.setCancelled(true);
         }
         else {
-            if (!event.getWhoClicked().isOp()) {
+            if (!event.getWhoClicked().hasPermission("lobbymanager.click")) {
                 event.setCancelled(true);
             }
         }
@@ -181,21 +182,21 @@ public class EventListeners implements Listener {
 
     @EventHandler
      public void blockBreak(BlockBreakEvent event) {
-        if (!event.getPlayer().isOp()) {
+        if (!event.getPlayer().hasPermission("lobbymanager.break")) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void blockPlace(BlockPlaceEvent event) {
-        if (!event.getPlayer().isOp()) {
+        if (!event.getPlayer().hasPermission("lobbymanager.build")) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void pickup(PlayerPickupItemEvent event) {
-        if (!event.getPlayer().isOp()) {
+        if (!event.getPlayer().hasPermission("lobbymanager.drop")) {
             event.setCancelled(true);
         }
     }
@@ -212,7 +213,9 @@ public class EventListeners implements Listener {
             jump = jump.add(facing);
             event.getPlayer().setVelocity(jump);
             event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.FIREWORK_BLAST, 10, 1);
-
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                ((CraftPlayer)p).getHandle().playerConnection.sendPacket(new PacketPlayOutWorldParticles(EnumParticle.FIREWORKS_SPARK, true, (float)event.getPlayer().getLocation().getX(), (float)event.getPlayer().getLocation().getY(), (float)event.getPlayer().getLocation().getZ(), (float)0.2, (float)0.0, (float)0.2, (float).1, 10, 0));
+            }
             event.setCancelled(true);
             event.getPlayer().setAllowFlight(false);
         }
@@ -220,7 +223,7 @@ public class EventListeners implements Listener {
 
     @EventHandler
     public void drop(PlayerDropItemEvent event) {
-        if (!event.getPlayer().isOp()) {
+        if (!event.getPlayer().hasPermission("lobbymanager.drop")) {
             event.setCancelled(true);
         }
     }
@@ -236,11 +239,8 @@ public class EventListeners implements Listener {
             }
             event.setCancelled(true);
         }
-        if (settings.getPetOwners().containsKey(event.getRightClicked())) {
-            if (settings.getPetOwners().get(event.getRightClicked()) != event.getPlayer()) {
-                event.getPlayer().sendMessage(ChatColor.GREEN + event.getRightClicked().getCustomName() + " isn't your pet.");
-                return;
-            }
+        if (event.getRightClicked() instanceof Hanging) {
+            return;
         }
         try {
             ArrayList<Entity> nearbyEntities = new ArrayList<>(event.getPlayer().getNearbyEntities(4, 4, 4));
@@ -270,14 +270,14 @@ public class EventListeners implements Listener {
             return;
         }
         if (stackerIn instanceof Player) {
-            PlayerPreference preferences = new Preferences(settings).getPreferences(((Player) stackerIn).getUniqueId().toString());
+            PlayerPreference preferences = new Preferences(settings).getPreferences(stackerIn.getUniqueId().toString());
             if (!preferences.canStack()) {
                 stackerIn.sendMessage(ChatColor.GREEN + "You are not playing stacker right now.");
                 return;
             }
         }
         if (stackIn instanceof Player) {
-            PlayerPreference preferences = new Preferences(settings).getPreferences(((Player) stackIn).getUniqueId().toString());
+            PlayerPreference preferences = new Preferences(settings).getPreferences(stackIn.getUniqueId().toString());
             if (!preferences.arePlayersVisible() || !preferences.canStack()) {
                 stackerIn.sendMessage(ChatColor.GREEN + ((Player) stackIn).getDisplayName() + " is not playing the stack game right now.");
                 return;
@@ -326,7 +326,7 @@ public class EventListeners implements Listener {
 
     @EventHandler
     public void breakPaintings(HangingBreakEvent event) {
-        if (!event.getEntity().isOp()) {
+        if (!event.getEntity().hasPermission("lobbymanager.break")) {
             event.setCancelled(true);
         }
     }

@@ -28,9 +28,7 @@ public class LobbyInventory {
         if (player.hasPermission("lobbymanager.whitelist")) {
             player.getInventory().setItem(1, getWhitelistIcon());
         }
-        //player.getInventory().setItem(3, getGadgetIcon());
         player.getInventory().setItem(4, getStoreIcon());
-        //player.getInventory().setItem(5, getPetIcon());
         player.getInventory().setItem(8, getPreferenceIcon());
     }
 
@@ -60,20 +58,6 @@ public class LobbyInventory {
         ArrayList<String> lore = new ArrayList<>();
         lore.add(ChatColor.ITALIC + "A place to get all of your visual goods!");
         return makeItem(Material.EMERALD, name, lore, (byte) 0);
-    }
-
-    private ItemStack getGadgetIcon() {
-        String name = ChatColor.GREEN + "Gadget Slot";
-        ArrayList<String> lore = new ArrayList<>();
-        lore.add(ChatColor.ITALIC + "Nothing equipped.");
-        return makeItem(Material.STAINED_GLASS_PANE, name, lore, (byte) 8);
-    }
-
-    private ItemStack getPetIcon() {
-        String name = ChatColor.GREEN + "Pet Slot";
-        ArrayList<String> lore = new ArrayList<>();
-        lore.add(ChatColor.ITALIC + "Nothing equipped.");
-        return makeItem(Material.STAINED_GLASS_PANE, name, lore, (byte) 8);
     }
 
     private ItemStack makeItem(Material type, String name, ArrayList<String> lore, byte color) {

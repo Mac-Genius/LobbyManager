@@ -105,10 +105,6 @@ public class SQLConnect {
 
     public boolean testConnection() {
         Connection connection = getConnection();
-        if (connection != null) {
-            return true;
-        } else {
-            return false;
-        }
+        return connection != null;
     }
 }

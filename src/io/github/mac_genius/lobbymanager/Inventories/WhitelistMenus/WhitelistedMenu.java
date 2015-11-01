@@ -101,15 +101,17 @@ public class WhitelistedMenu implements Listener {
     @EventHandler
     public void click(InventoryClickEvent event) {
         if (event.getWhoClicked() == player) {
-            if (event.getCurrentItem().getType() == Material.STAINED_GLASS_PANE && event.getSlot() == inventorySize - 1) {
-                HandlerList.unregisterAll(this);
-                settings.getPlugin().getServer().getPluginManager().registerEvents(new WhitelistMenu(settings, player), settings.getPlugin());
-            } else {
-                if (event.getClick() == ClickType.LEFT) {
-                    whitelist.setWhitelistStatus(event.getCurrentItem().getItemMeta().getLore().get(1), 3);
+            if (event.getCurrentItem() != null) {
+                if (event.getCurrentItem().getType() == Material.STAINED_GLASS_PANE && event.getSlot() == inventorySize - 1) {
                     HandlerList.unregisterAll(this);
-                    settings.getPlugin().getServer().getPluginManager().registerEvents(new WhitelistedMenu(settings, player), settings.getPlugin());
-                    player.sendMessage(ChatColor.GREEN + "Player has been added to the banned list.");
+                    settings.getPlugin().getServer().getPluginManager().registerEvents(new WhitelistMenu(settings, player), settings.getPlugin());
+                } else {
+                    if (event.getClick() == ClickType.LEFT) {
+                        whitelist.setWhitelistStatus(event.getCurrentItem().getItemMeta().getLore().get(1), 3);
+                        HandlerList.unregisterAll(this);
+                        settings.getPlugin().getServer().getPluginManager().registerEvents(new WhitelistedMenu(settings, player), settings.getPlugin());
+                        player.sendMessage(ChatColor.GREEN + "Player has been added to the banned list.");
+                    }
                 }
             }
             event.setCancelled(true);

@@ -1,6 +1,7 @@
 name: LobbyManager
 main: io.github.mac_genius.lobbymanager.LobbyManager
 version: 1.0
+softdepend: [SQLPermissions]
 permissions:
     lobbymanager.*:
         description: Gives access to all commands for the plugin
@@ -11,6 +12,11 @@ permissions:
             lobbymanager.parkour: true
             lobbymanager.createtext: true
             lobbymanager.whitelist: true
+            lobbymanager.cloak: true
+            lobbymanager.build: true
+            lobbymanager.break: true
+            lobbymanager.drop: true
+            lobbymanager.click: true
 
     lobbymanager.reload:
         description: Allows a player to reload the config
@@ -29,6 +35,21 @@ permissions:
         default: op
     lobbymanager.whitelist:
         description: Allows players to manage the whitelist
+        default: op
+    lobbymanager.cloak:
+        description: Allows players to cloak
+        default: op
+    lobbymanager.build:
+        description: Allows players to build
+        default: op
+    lobbymanager.break:
+        description: Allows players to break stuff
+        default: op
+    lobbymanager.drop:
+        description: Allows players to drop stuff
+        default: op
+    lobbymanager.click:
+        description: Allows players to click items
         default: op
 
 commands:
@@ -56,4 +77,14 @@ commands:
         description: Allows player to create text.
         usage: /holotext
         permission: lobbymanager.createtext
+        permission-message: You do not have permission to do that.
+    cloak:
+        description: Allows player to cloak.
+        usage: /cloak
+        permission: lobbymanager.cloak
+        permission-message: You do not have permission to do that.
+    uncloak:
+        description: Allows player to uncloak.
+        usage: /uncloak
+        permission: lobbymanager.cloak
         permission-message: You do not have permission to do that.

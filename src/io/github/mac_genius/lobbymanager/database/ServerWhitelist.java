@@ -67,11 +67,7 @@ public class ServerWhitelist {
                 registered = results.getInt(3);
             }
             connection.close();
-            if (registered == 1) {
-                return true;
-            } else {
-                return false;
-            }
+            return registered == 1;
         } catch (SQLException e) {
             settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
             return false;
@@ -88,11 +84,7 @@ public class ServerWhitelist {
                 registered = results.getInt(3);
             }
             connection.close();
-            if (registered == 2) {
-                return true;
-            } else {
-                return false;
-            }
+            return registered == 2;
         } catch (SQLException e) {
             settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
             return false;
@@ -137,11 +129,7 @@ public class ServerWhitelist {
                 registered = results.getInt(3);
             }
             connection.close();
-            if (registered == 3) {
-                return true;
-            } else {
-                return false;
-            }
+            return registered == 3;
         } catch (SQLException e) {
             settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not see if the player was registered." + Ansi.ansi().fg(Ansi.Color.WHITE));
             return false;

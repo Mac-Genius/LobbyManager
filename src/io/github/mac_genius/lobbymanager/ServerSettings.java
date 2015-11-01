@@ -1,5 +1,6 @@
 package io.github.mac_genius.lobbymanager;
 
+import com.mojang.authlib.GameProfile;
 import io.github.mac_genius.lobbymanager.NPCHandler.MessageConfig;
 import io.github.mac_genius.lobbymanager.Parkour.ParkourCourse;
 import io.github.mac_genius.lobbymanager.Parkour.PlayerParkour;
@@ -35,6 +36,9 @@ public class ServerSettings {
     private MessageConfig messageConfig;
     private ScoreboardManager manager;
     private BukkitScheduler taskSchedule;
+    private Map<String, GameProfile> profiles;
+    private Map<UUID, String> cloaked;
+    private Map<UUID, String> oldName;
 
     public ServerSettings(Plugin plugin) {
         this.plugin = plugin;
@@ -51,6 +55,9 @@ public class ServerSettings {
         setupPets();
         setupParkour();
         setupCourses();
+        setupProfiles();
+        setupCloaked();
+        setupOldName();
     }
 
     private void setupPlugin() {
@@ -70,6 +77,10 @@ public class ServerSettings {
 
     private void setupThrown() {
         thrown = Collections.synchronizedMap(new HashMap<>());
+    }
+
+    private void setupProfiles() {
+        profiles = Collections.synchronizedMap(new HashMap<>());
     }
 
     private void setupSQL() {
@@ -117,8 +128,16 @@ public class ServerSettings {
         return output;
     }
 
-    public void setupParkour() {
+    private void setupParkour() {
         parkour = Collections.synchronizedMap(new HashMap<>());
+    }
+
+    private void setupCloaked() {
+        cloaked = Collections.synchronizedMap(new HashMap<>());
+    }
+
+    private void setupOldName() {
+        oldName = Collections.synchronizedMap(new HashMap<>());
     }
 
     public void setupCourses() {
@@ -184,5 +203,17 @@ public class ServerSettings {
 
     public Map<Player, PlayerParkour> getParkour() {
         return parkour;
+    }
+
+    public Map<String, GameProfile> getProfiles() {
+        return profiles;
+    }
+
+    public Map<UUID, String> getCloaked() {
+        return cloaked;
+    }
+
+    public Map<UUID, String> getOldName() {
+        return oldName;
     }
 }

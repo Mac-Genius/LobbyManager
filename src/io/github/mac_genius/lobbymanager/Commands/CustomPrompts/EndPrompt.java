@@ -34,8 +34,8 @@ public class EndPrompt extends MessagePrompt {
             ((ArmorStand)entity).setVisible(false);
             ((ArmorStand)entity).setGravity(false);
             ((ArmorStand)entity).setBasePlate(false);
-            ((ArmorStand)entity).setCustomName(g);
-            ((ArmorStand)entity).setCustomNameVisible(true);
+            entity.setCustomName(g);
+            entity.setCustomNameVisible(true);
             location.setY(location.getY() - .3);
         }
         return ChatColor.LIGHT_PURPLE + "[HoloText] " + ChatColor.WHITE + "Excellent! I will create your display for you.";

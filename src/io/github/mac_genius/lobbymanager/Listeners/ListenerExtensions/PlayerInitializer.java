@@ -1,10 +1,11 @@
 package io.github.mac_genius.lobbymanager.Listeners.ListenerExtensions;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import io.github.mac_genius.lobbymanager.Inventories.LobbyInventory;
 import io.github.mac_genius.lobbymanager.Parkour.PlayerParkour;
 import io.github.mac_genius.lobbymanager.ScoreboardHandler.ScoreboardSetup;
 import io.github.mac_genius.lobbymanager.ServerSettings;
-import io.github.mac_genius.lobbymanager.database.PetMenu;
 import io.github.mac_genius.lobbymanager.database.Preferences;
 import io.github.mac_genius.lobbymanager.database.SQLObjects.PlayerPreference;
 import io.github.mac_genius.lobbymanager.database.ServerWhitelist;
@@ -14,11 +15,8 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.WeatherType;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scoreboard.ScoreboardManager;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Scanner;
 
 /**
@@ -55,8 +53,6 @@ public class PlayerInitializer {
         preferences.addPlayer(player);
         TokoinUpdater tokoinUpdater = new TokoinUpdater(settings, player);
         tokoinUpdater.addPlayer();
-        PetMenu menu = new PetMenu(settings);
-        menu.addMenu(player);
     }
 
     private void worldSettings() {

@@ -3,6 +3,8 @@ package io.github.mac_genius.lobbymanager;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import io.github.mac_genius.lobbymanager.Commands.Cloak.CloakCommand;
+import io.github.mac_genius.lobbymanager.Commands.Cloak.Uncloak;
 import io.github.mac_genius.lobbymanager.Commands.Commands;
 import io.github.mac_genius.lobbymanager.Commands.CreateText;
 import io.github.mac_genius.lobbymanager.Commands.ParkourCommand;
@@ -29,6 +31,8 @@ public class LobbyManager extends JavaPlugin implements PluginMessageListener {
         this.getCommand("sstop").setExecutor(new SafeStop(settings));
         this.getCommand("parkour").setExecutor(new ParkourCommand(settings));
         this.getCommand("holotext").setExecutor(new CreateText(settings));
+        this.getCommand("cloak").setExecutor(new CloakCommand(settings));
+        this.getCommand("uncloak").setExecutor(new Uncloak(settings));
         BukkitScheduler taskSchedule = Bukkit.getScheduler();
         //taskSchedule.runTaskTimer(plugin, new UpdateShop(settings), 0, 3);
         taskSchedule.runTaskTimer(plugin, new StopMovement(settings), 0, 1);
