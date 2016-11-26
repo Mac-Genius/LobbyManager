@@ -25,8 +25,9 @@ public class LobbyInventory {
         player.getInventory().clear();
         player.getInventory().setHeldItemSlot(0);
         player.getInventory().setItem(0, getServerIcon());
+        player.getInventory().setItem(1, getLobbySelector());
         if (player.hasPermission("lobbymanager.whitelist")) {
-            player.getInventory().setItem(1, getWhitelistIcon());
+            player.getInventory().setItem(2, getWhitelistIcon());
         }
         player.getInventory().setItem(4, getStoreIcon());
         player.getInventory().setItem(8, getPreferenceIcon());
@@ -36,36 +37,34 @@ public class LobbyInventory {
         String name = ChatColor.AQUA + "Server Selector  " + ChatColor.GRAY + "(Right Click to open)";
         ArrayList<String> lore = new ArrayList<>();
         lore.add(ChatColor.GRAY + "" + ChatColor.ITALIC + "Brings up the different games available on the network!");
-        return makeItem(Material.COMPASS, name, lore, (byte) 0);
+        return AlterItem.makeItem(Material.COMPASS, name, lore, (byte) 0, 1);
+    }
+
+    private ItemStack getLobbySelector() {
+        String name = ChatColor.AQUA + "Lobby Selector  " + ChatColor.GRAY + "(Right Click to open)";
+        ArrayList<String> lore = new ArrayList<>();
+        lore.add(ChatColor.GRAY + "" + ChatColor.ITALIC + "Choose what lobby you want to be in!");
+        return AlterItem.makeItem(Material.WATCH, name, lore, (byte) 0, 1);
     }
 
     private ItemStack getWhitelistIcon() {
         String name = ChatColor.GOLD + "Whitelist Manager  " + ChatColor.GRAY + "(Right Click to open)";
         ArrayList<String> lore = new ArrayList<>();
         lore.add(ChatColor.ITALIC + "Allows you to edit the whitelist.");
-        return makeItem(Material.BOOK, name, lore, (byte) 0);
+        return AlterItem.makeItem(Material.BOOK, name, lore, (byte) 0, 1);
     }
 
     private ItemStack getPreferenceIcon() {
         String name = ChatColor.RED + "Lobby Settings  " + ChatColor.GRAY + "(Right Click to open)";
         ArrayList<String> lore = new ArrayList<>();
         lore.add(ChatColor.ITALIC + "Your lobby settings.");
-        return makeItem(Material.PAPER, name, lore, (byte) 0);
+        return AlterItem.makeItem(Material.PAPER, name, lore, (byte) 0, 1);
     }
 
     private ItemStack getStoreIcon() {
         String name = ChatColor.GREEN + "One Stop Shop  " + ChatColor.GRAY + "(Right Click to open)";
         ArrayList<String> lore = new ArrayList<>();
         lore.add(ChatColor.ITALIC + "A place to get all of your visual goods!");
-        return makeItem(Material.EMERALD, name, lore, (byte) 0);
-    }
-
-    private ItemStack makeItem(Material type, String name, ArrayList<String> lore, byte color) {
-        ItemStack item = new ItemStack(type, 1, color);
-        ItemMeta itemMeta = item.getItemMeta();
-        itemMeta.setDisplayName(name);
-        itemMeta.setLore(lore);
-        item.setItemMeta(itemMeta);
-        return item;
+        return AlterItem.makeItem(Material.EMERALD, name, lore, (byte) 0, 1);
     }
 }

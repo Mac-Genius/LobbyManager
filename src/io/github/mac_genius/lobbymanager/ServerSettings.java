@@ -2,10 +2,7 @@ package io.github.mac_genius.lobbymanager;
 
 import com.mojang.authlib.GameProfile;
 import io.github.mac_genius.lobbymanager.NPCHandler.MessageConfig;
-import io.github.mac_genius.lobbymanager.Parkour.ParkourCourse;
-import io.github.mac_genius.lobbymanager.Parkour.PlayerParkour;
 import io.github.mac_genius.lobbymanager.database.NPCList;
-import io.github.mac_genius.lobbymanager.database.ParkourCourses;
 import io.github.mac_genius.lobbymanager.database.SQLConnect;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.ArmorStand;
@@ -29,10 +26,6 @@ public class ServerSettings {
     private Map<Player, Boolean> thrown;
     private Map<Entity, String> npcs;
     private Map<Entity, ArrayList<ArmorStand>> npcTags;
-    private Map<Player, Entity> playerPets;
-    private Map<Entity, Player> petOwners;
-    private Map<Player, PlayerParkour> parkour;
-    private ArrayList<ParkourCourse> courses;
     private MessageConfig messageConfig;
     private ScoreboardManager manager;
     private BukkitScheduler taskSchedule;
@@ -52,9 +45,6 @@ public class ServerSettings {
         setupThrown();
         setupSQL();
         setupNPC();
-        setupPets();
-        setupParkour();
-        setupCourses();
         setupProfiles();
         setupCloaked();
         setupOldName();
@@ -98,11 +88,6 @@ public class ServerSettings {
         npcTags = getNpcTags();
     }
 
-    private void setupPets() {
-        playerPets = Collections.synchronizedMap(new HashMap<>());
-        petOwners = Collections.synchronizedMap(new HashMap<>());
-    }
-
     private Map<Entity, String> npcList() {
         NPCList list = new NPCList(this);
         Map<Entity, String> npc = Collections.synchronizedMap(new HashMap<>());
@@ -128,10 +113,6 @@ public class ServerSettings {
         return output;
     }
 
-    private void setupParkour() {
-        parkour = Collections.synchronizedMap(new HashMap<>());
-    }
-
     private void setupCloaked() {
         cloaked = Collections.synchronizedMap(new HashMap<>());
     }
@@ -140,25 +121,12 @@ public class ServerSettings {
         oldName = Collections.synchronizedMap(new HashMap<>());
     }
 
-    public void setupCourses() {
-        ParkourCourses courses = new ParkourCourses(this);
-        this.courses = courses.getCourses();
-    }
-
-    public Map<Entity, Player> getPetOwners() {
-        return petOwners;
-    }
-
     public Map<Entity, String> getNpcs() {
         return npcs;
     }
 
     public Map<Player, Boolean> getThrown() {
         return thrown;
-    }
-
-    public Map<Player, Entity> getPlayerPets() {
-        return playerPets;
     }
 
     public Map<String, String> getPlayerCount() {
@@ -195,14 +163,6 @@ public class ServerSettings {
 
     public Map<Entity, ArrayList<ArmorStand>> getNPCTags() {
         return npcTags;
-    }
-
-    public ArrayList<ParkourCourse> getCourses() {
-        return courses;
-    }
-
-    public Map<Player, PlayerParkour> getParkour() {
-        return parkour;
     }
 
     public Map<String, GameProfile> getProfiles() {

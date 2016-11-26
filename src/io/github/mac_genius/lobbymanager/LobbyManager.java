@@ -3,20 +3,21 @@ package io.github.mac_genius.lobbymanager;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import io.github.mac_genius.lobbymanager.Commands.Cloak.CloakCommand;
-import io.github.mac_genius.lobbymanager.Commands.Cloak.Uncloak;
 import io.github.mac_genius.lobbymanager.Commands.Commands;
 import io.github.mac_genius.lobbymanager.Commands.CreateText;
-import io.github.mac_genius.lobbymanager.Commands.ParkourCommand;
 import io.github.mac_genius.lobbymanager.Commands.SafeStop;
 import io.github.mac_genius.lobbymanager.Listeners.EventListeners;
+import io.github.mac_genius.lobbymanager.Listeners.ServerSelectListener;
 import io.github.mac_genius.lobbymanager.NPCHandler.StopMovement;
-import io.github.mac_genius.lobbymanager.SecondaryThreads.SecondaryThread;
 import io.github.mac_genius.lobbymanager.SecondaryThreads.Runnables.ServerPortals;
-import io.github.mac_genius.lobbymanager.SecondaryThreads.UpdatePetLoc;
+import io.github.mac_genius.lobbymanager.SecondaryThreads.SecondaryThread;
+import io.github.mac_genius.lobbymanager.Util.ServerSelectManager;
+import io.github.mac_genius.lobbymanager.database.TokoinUpdater;
+import io.github.mac_genius.sqleconomy.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -24,26 +25,33 @@ import org.bukkit.scheduler.BukkitScheduler;
 public class LobbyManager extends JavaPlugin implements PluginMessageListener {
     private Plugin plugin = this;
     private ServerSettings settings;
+    private static LobbyManager instance;
+    private ServerSelectManager manager;
+    private Economy economy;
 
     public void onEnable() {
-        settings = new ServerSettings(plugin);
-        this.getCommand("sm").setExecutor(new Commands(settings));
-        this.getCommand("sstop").setExecutor(new SafeStop(settings));
-        this.getCommand("parkour").setExecutor(new ParkourCommand(settings));
-        this.getCommand("holotext").setExecutor(new CreateText(settings));
-        this.getCommand("cloak").setExecutor(new CloakCommand(settings));
-        this.getCommand("uncloak").setExecutor(new Uncloak(settings));
-        BukkitScheduler taskSchedule = Bukkit.getScheduler();
-        //taskSchedule.runTaskTimer(plugin, new UpdateShop(settings), 0, 3);
-        taskSchedule.runTaskTimer(plugin, new StopMovement(settings), 0, 1);
-        taskSchedule.runTaskTimer(settings.getPlugin(), new UpdatePetLoc(settings), 0, 1);
-        SecondaryThread secondaryThread = new SecondaryThread(settings);
-        getServer().getPluginManager().registerEvents(new EventListeners(settings), this);
-        taskSchedule.runTaskTimer(plugin, secondaryThread, 0, 10);
-        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-        this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
-        this.getServer().getScheduler().runTaskTimerAsynchronously(plugin, new ServerPortals(settings), 0, 20);
-        getLogger().info("The plugin has been enabled.");
+        instance = this;
+        if (setupEconomy()) {
+            manager = new ServerSelectManager();
+            settings = new ServerSettings(plugin);
+            this.getCommand("sm").setExecutor(new Commands(settings));
+            this.getCommand("sstop").setExecutor(new SafeStop(settings));
+            this.getCommand("holotext").setExecutor(new CreateText(settings));
+            BukkitScheduler taskSchedule = Bukkit.getScheduler();
+            taskSchedule.runTaskTimer(plugin, new StopMovement(settings), 0, 1);
+            SecondaryThread secondaryThread = new SecondaryThread(settings);
+            getServer().getPluginManager().registerEvents(new EventListeners(settings), this);
+            getServer().getPluginManager().registerEvents(new TokoinUpdater(), this);
+            taskSchedule.runTaskTimer(plugin, secondaryThread, 0, 10);
+            this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+            this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
+            this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new ServerSelectListener());
+            this.getServer().getScheduler().runTaskTimerAsynchronously(plugin, new ServerPortals(settings), 0, 20);
+            getLogger().info("The plugin has been enabled.");
+        } else {
+            getLogger().info("Could not setup the economy!");
+            getServer().getPluginManager().disablePlugin(this);
+        }
     }
 
     public void onDisable() {
@@ -93,4 +101,25 @@ public class LobbyManager extends JavaPlugin implements PluginMessageListener {
         }
     }
 
+    public ServerSelectManager getServerSelectManager() {
+        return manager;
+    }
+
+    public static LobbyManager getSingleton() {
+        return instance;
+    }
+
+    public Economy getEconomy() {
+        return economy;
+    }
+
+    public boolean setupEconomy() {
+        RegisteredServiceProvider<Economy> econ = getServer().getServicesManager().getRegistration(Economy.class);
+        if (econ != null) {
+            economy = econ.getProvider();
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

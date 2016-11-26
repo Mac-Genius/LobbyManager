@@ -37,7 +37,7 @@ public class WhitelistedMenu implements Listener {
     }
 
     private void setInventory() {
-        int size = whitelist.waitlistSize();
+        int size = whitelist.whitelistSize();
         if (size < 9) {
             size = 18;
         } else if (size < 18) {

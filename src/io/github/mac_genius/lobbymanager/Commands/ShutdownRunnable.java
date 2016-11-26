@@ -22,10 +22,6 @@ public class ShutdownRunnable implements Runnable {
         settings.getPlugin().getServer().broadcastMessage(ChatColor.BLUE + "[Announcement] " + ChatColor.WHITE + "The server is restarting.");
         ArrayList<Player> player = new ArrayList<>(Bukkit.getOnlinePlayers());
         for (Player p : player) {
-            if (settings.getPlayerPets().containsKey(p)) {
-                settings.getPlayerPets().get(p).remove();
-                settings.getPlayerPets().remove(p);
-            }
             p.getInventory().clear();
         }
         settings.getPlugin().getServer().shutdown();

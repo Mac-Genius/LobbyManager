@@ -1,113 +1,28 @@
 package io.github.mac_genius.lobbymanager.database;
 
-import io.github.mac_genius.lobbymanager.ServerSettings;
+import io.github.mac_genius.sqleconomy.event.UpdatePlayerBankEvent;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
-import org.fusesource.jansi.Ansi;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Mac on 5/7/2015.
  */
-public class TokoinUpdater {
-    private ServerSettings settings;
-    private SQLConnect connect;
-    private Player player;
+public class TokoinUpdater implements Listener {
 
-    public TokoinUpdater(ServerSettings settings, Player player) {
-        this.settings = settings;
-        connect = new SQLConnect(settings);
-        this.player = player;
+    @EventHandler
+    public void bankEvent(UpdatePlayerBankEvent event) {
+        updateScoreboard((int) event.getBank().getBalance(), event.getPlayer());
     }
 
-    public void addPlayer() {
-        Connection connection = connect.getConnection();
-        String uuid = player.getUniqueId().toString();
-        try {
-            PreparedStatement fetch = connection.prepareStatement("SELECT * FROM Players WHERE Uuid='" + uuid + "'");
-            ResultSet results = fetch.executeQuery();
-            String fetcheduuid = "";
-            while (results.next()) {
-                fetcheduuid = results.getString(2);
-            }
-            if (fetcheduuid.equals("")) {
-                addToTable(uuid);
-            }
-            updateScoreboard(getTokoins());
-            connection.close();
-        } catch (SQLException e) {
-            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not add the player to database." + Ansi.ansi().fg(Ansi.Color.WHITE));
-        }
-    }
-
-    private void addToTable(String UUID) {
-        Connection connection = connect.getConnection();
-        try {
-            PreparedStatement add = connection.prepareStatement("INSERT INTO Players(Uuid, Tokoin) VALUES(?, ?)");
-            add.setString(1, UUID);
-            add.setInt(2, 5000);
-            add.executeUpdate();
-            connection.close();
-        } catch (SQLException c) {
-            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not add the player to database." + Ansi.ansi().fg(Ansi.Color.WHITE));
-        }
-    }
-
-    public int getTokoins() {
-        Connection connection = connect.getConnection();
-        String uuid = player.getUniqueId().toString();
-        int tokoins = 0;
-        try {
-            PreparedStatement fetch = connection.prepareStatement("SELECT * FROM Players WHERE Uuid='" + uuid + "'");
-            ResultSet results = fetch.executeQuery();
-            while (results.next()) {
-                tokoins = results.getInt(3);
-            }
-            connection.close();
-            return tokoins;
-        } catch (SQLException e) {
-            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not add the player to database." + Ansi.ansi().fg(Ansi.Color.WHITE));
-            return tokoins;
-        }
-    }
-
-    public void setTokoins(int amount) {
-        Connection connection = connect.getConnection();
-        String uuid = player.getUniqueId().toString();
-        try {
-            PreparedStatement set = connection.prepareStatement("UPDATE Players SET Tokoin='" + amount + "' WHERE Uuid='" + uuid + "'");
-            set.executeUpdate();
-            updateScoreboard(getTokoins());
-            connection.close();
-        } catch (SQLException e) {
-            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not set the player's tokoin amount." + Ansi.ansi().fg(Ansi.Color.WHITE));
-        }
-    }
-
-    public void addTokoins(int amount) {
-        Connection connection = connect.getConnection();
-        String uuid = player.getUniqueId().toString();
-        int total = getTokoins() + amount;
-        try {
-            PreparedStatement set = connection.prepareStatement("UPDATE Players SET Tokoin='" + total + "' WHERE Uuid='" + uuid + "'");
-            set.executeUpdate();
-            updateScoreboard(getTokoins());
-            connection.close();
-        } catch (SQLException e) {
-            settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Could not set the player's tokoin amount." + Ansi.ansi().fg(Ansi.Color.WHITE));
-        }
-    }
-
-    private void updateScoreboard(int amount) {
+    public static void updateScoreboard(int amount, Player player) {
         Scoreboard scoreboard = player.getScoreboard();
         Objective o = scoreboard.getObjective(DisplaySlot.SIDEBAR);
         ArrayList<String> list = new ArrayList<>(scoreboard.getEntries());

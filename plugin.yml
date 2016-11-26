@@ -1,7 +1,7 @@
 name: LobbyManager
 main: io.github.mac_genius.lobbymanager.LobbyManager
 version: 1.0
-softdepend: [SQLPermissions]
+softdepend: [SQLPermissions, SQLEconomy]
 permissions:
     lobbymanager.*:
         description: Gives access to all commands for the plugin
@@ -9,14 +9,13 @@ permissions:
             lobbymanager.reload: true
             lobbymanager.help: true
             lobbymanager.stop: true
-            lobbymanager.parkour: true
             lobbymanager.createtext: true
             lobbymanager.whitelist: true
-            lobbymanager.cloak: true
             lobbymanager.build: true
             lobbymanager.break: true
             lobbymanager.drop: true
             lobbymanager.click: true
+            lobbymanager.test: true
 
     lobbymanager.reload:
         description: Allows a player to reload the config
@@ -27,17 +26,11 @@ permissions:
     lobbymanager.stop:
         description: Stops the server safely
         default: op
-    lobbymanager.parkour:
-        description: Allows players to interact with parkour
-        default: true
     lobbymanager.createtext:
         description: Allows players to create text
         default: op
     lobbymanager.whitelist:
         description: Allows players to manage the whitelist
-        default: op
-    lobbymanager.cloak:
-        description: Allows players to cloak
         default: op
     lobbymanager.build:
         description: Allows players to build
@@ -51,7 +44,9 @@ permissions:
     lobbymanager.click:
         description: Allows players to click items
         default: op
-
+    lobbymanager.test:
+        description: Allows players to connect to test servers
+        default: op
 commands:
     sm:
         description: This is the help command.
@@ -68,23 +63,8 @@ commands:
         usage: /sstop
         permission: lobbymanager.stop
         permission-message: You do not have permission to do that.
-    parkour:
-        description: Deals with parkour.
-        usage: /parkour <reset/quit>
-        permission: lobbymanager.parkour
-        permission-message: You do not have permission to do that.
     holotext:
         description: Allows player to create text.
         usage: /holotext
         permission: lobbymanager.createtext
-        permission-message: You do not have permission to do that.
-    cloak:
-        description: Allows player to cloak.
-        usage: /cloak
-        permission: lobbymanager.cloak
-        permission-message: You do not have permission to do that.
-    uncloak:
-        description: Allows player to uncloak.
-        usage: /uncloak
-        permission: lobbymanager.cloak
         permission-message: You do not have permission to do that.

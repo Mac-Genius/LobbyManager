@@ -1,15 +1,11 @@
 package io.github.mac_genius.lobbymanager.Listeners.ListenerExtensions;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import io.github.mac_genius.lobbymanager.Inventories.LobbyInventory;
-import io.github.mac_genius.lobbymanager.Parkour.PlayerParkour;
 import io.github.mac_genius.lobbymanager.ScoreboardHandler.ScoreboardSetup;
 import io.github.mac_genius.lobbymanager.ServerSettings;
 import io.github.mac_genius.lobbymanager.database.Preferences;
 import io.github.mac_genius.lobbymanager.database.SQLObjects.PlayerPreference;
 import io.github.mac_genius.lobbymanager.database.ServerWhitelist;
-import io.github.mac_genius.lobbymanager.database.TokoinUpdater;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -51,8 +47,6 @@ public class PlayerInitializer {
         whitelist.addPlayer(player);
         Preferences preferences = new Preferences(settings);
         preferences.addPlayer(player);
-        TokoinUpdater tokoinUpdater = new TokoinUpdater(settings, player);
-        tokoinUpdater.addPlayer();
     }
 
     private void worldSettings() {
@@ -62,8 +56,6 @@ public class PlayerInitializer {
     }
 
     private void addCustom() {
-        PlayerParkour parkour = new PlayerParkour(settings, player);
-        settings.getParkour().put(player, parkour);
         settings.getThrown().put(player, false);
     }
 

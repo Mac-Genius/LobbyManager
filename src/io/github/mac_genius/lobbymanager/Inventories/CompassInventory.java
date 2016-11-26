@@ -1,10 +1,16 @@
 package io.github.mac_genius.lobbymanager.Inventories;
 
+import io.github.mac_genius.lobbymanager.LobbyManager;
 import io.github.mac_genius.lobbymanager.ServerSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,20 +21,18 @@ import java.util.*;
 /**
  * Created by Mac on 6/22/2015.
  */
-public class CompassInventory {
+public class CompassInventory implements Listener {
     private ServerSettings settings;
     private Player player;
+    private int updateCancel;
 
     public CompassInventory(ServerSettings settings, Player playerIn) {
         this.settings = settings;
         player = playerIn;
-    }
-
-    public Inventory getInventory(Player playerIn) {
-        Inventory serverTypes = Bukkit.createInventory(playerIn, 27, "Server Menu:");
-        serverTypes.setItem(12, server("survival", playerIn));
-        serverTypes.setItem(14, server("zombie", playerIn));
-        return serverTypes;
+        openInventory();
+        updateCancel = LobbyManager.getSingleton().getServer().getScheduler().runTaskTimerAsynchronously(LobbyManager.getSingleton(), () -> {
+            updatePlayerCount();
+        }, 0, 20).getTaskId();
     }
 
     public ArrayList<String> serverInfo(String serverNameIn, Player playerIn) {
@@ -37,72 +41,113 @@ public class CompassInventory {
             itemInfo.add(ChatColor.DARK_GRAY + "Genre: Vanilla");
             itemInfo.add(" ");
             itemInfo.add(ChatColor.WHITE + "This is a vanilla Minecraft");
-            itemInfo.add(ChatColor.WHITE + "server running Minecraft 1.8.7.");
+            itemInfo.add(ChatColor.WHITE + "server running Minecraft 1.8.9.");
             itemInfo.add(ChatColor.WHITE + "Join for a plugin/mod free time!");
             itemInfo.add(" ");
             itemInfo.add(ChatColor.WHITE + playerAmount("Survival"));
         }
-        if (serverNameIn.equalsIgnoreCase("zombie")) {
-            itemInfo.add(ChatColor.DARK_GRAY + "Genre: Zombie Apocalypse");
+        if (serverNameIn.equalsIgnoreCase("test")) {
+            itemInfo.add(ChatColor.DARK_GRAY + "Genre: Testing plugins");
             itemInfo.add(" ");
-            itemInfo.add(ChatColor.WHITE + "Fight your way through hordes");
-            itemInfo.add(ChatColor.WHITE + "of zombies while trying to");
-            itemInfo.add(ChatColor.WHITE + "survive!");
+            itemInfo.add(ChatColor.WHITE + "Test new plugins and try");
+            itemInfo.add(ChatColor.WHITE + "to break them!");
             itemInfo.add(" ");
-            itemInfo.add(ChatColor.WHITE + playerAmount("Zombie"));
+            itemInfo.add(ChatColor.WHITE + playerAmount("TEST"));
         }
         return itemInfo;
     }
 
     public String playerAmount(String serverType) {
+        int playerAmounts = LobbyManager.getSingleton().getServerSelectManager().getPlayerAmount(serverType);
         String amount = "There are currently ";
-        int playerAmounts = 0;
-        if (serverType.contains(serverType)) {
-            Set<String> stuff = settings.getPlayerCount().keySet();
-            for (String key : stuff) {
-                if (key.contains(serverType)) {
-                    playerAmounts += Integer.parseInt(settings.getPlayerCount().get(key));
-                }
-            }
-        }
-        amount += playerAmounts + " player(s) on this server!";
-        return amount;
-    }
 
-    public ItemStack server(String serverNameIn, Player playerIn) {
-        ItemStack server;
-        if (serverNameIn.equalsIgnoreCase("survival")) {
-            server = new ItemStack(Material.DIAMOND_PICKAXE, 1);
-            ItemMeta itemInfo = server.getItemMeta();
-            itemInfo.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "Survival");
-            itemInfo.setLore(serverInfo("survival", playerIn));
-            server.setItemMeta(itemInfo);
+        if (playerAmounts < 0) {
+            return "There are no available servers at this time.";
+        }else {
+            amount += playerAmounts + " player(s) playing this game!";
+            return amount;
         }
-        else if (serverNameIn.equalsIgnoreCase("zombie")) {
-            server = new ItemStack(Material.ROTTEN_FLESH, 1);
-            ItemMeta itemInfo = server.getItemMeta();
-            itemInfo.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "Zombie World");
-            itemInfo.setLore(serverInfo("zombie", playerIn));
-            server.setItemMeta(itemInfo);
-        }
-        else {
-            server = new ItemStack(Material.STONE, 1);
-        }
-        return server;
     }
 
     public void updatePlayerCount() {
-        for (ItemStack i : player.getOpenInventory().getTopInventory()) {
-            if (i != null) {
-                if (i.getItemMeta().getDisplayName().contains("Survival")) {
-                    ItemMeta meta = i.getItemMeta();
-                    meta.setLore(serverInfo("survival", player));
-                    i.setItemMeta(meta);
+        if (player.hasPermission("lobbymanager.test")) {
+            ItemStack survival = player.getOpenInventory().getTopInventory().getItem(12);
+            ItemMeta meta = survival.getItemMeta();
+            meta.setLore(serverInfo("Survival", player));
+            survival.setItemMeta(meta);
+            player.getOpenInventory().getTopInventory().setItem(12, survival);
+
+            ItemStack test = player.getOpenInventory().getTopInventory().getItem(14);
+            ItemMeta metaT = test.getItemMeta();
+            metaT.setLore(serverInfo("TEST", player));
+            survival.setItemMeta(metaT);
+            player.getOpenInventory().getTopInventory().setItem(14, test);
+        } else {
+            ItemStack survival = player.getOpenInventory().getTopInventory().getItem(13);
+            ItemMeta meta = survival.getItemMeta();
+            meta.setLore(serverInfo("Survival", player));
+            survival.setItemMeta(meta);
+            player.getOpenInventory().getTopInventory().setItem(13, survival);
+        }
+    }
+
+    private void openInventory() {
+        Inventory serverTypes = Bukkit.createInventory(player, 27, "Server Menu:");
+        if (player.hasPermission("lobbymanager.test")) {
+            ItemStack survival = new ItemStack(Material.DIAMOND_PICKAXE, 1);
+            ItemMeta itemInfo = survival.getItemMeta();
+            itemInfo.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "Survival");
+            itemInfo.setLore(serverInfo("survival", player));
+            survival.setItemMeta(itemInfo);
+            serverTypes.setItem(12, survival);
+
+            ItemStack test = new ItemStack(Material.REDSTONE_TORCH_ON, 1);
+            ItemMeta itemMeta = test.getItemMeta();
+            itemInfo.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "Test Worlds");
+            itemInfo.setLore(serverInfo("test", player));
+            test.setItemMeta(itemInfo);
+            serverTypes.setItem(14, test);
+        } else {
+            ItemStack survival = new ItemStack(Material.DIAMOND_PICKAXE, 1);
+            ItemMeta itemInfo = survival.getItemMeta();
+            itemInfo.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + "Survival");
+            itemInfo.setLore(serverInfo("survival", player));
+            survival.setItemMeta(itemInfo);
+            serverTypes.setItem(13, survival);
+        }
+        player.openInventory(serverTypes);
+    }
+
+    @EventHandler
+    public void closeInventory(InventoryCloseEvent event) {
+        if (event.getPlayer().equals(player)) {
+            LobbyManager.getSingleton().getServer().getScheduler().cancelTask(updateCancel);
+            HandlerList.unregisterAll(this);
+        }
+    }
+
+    @EventHandler
+    public void selectItem(InventoryClickEvent event) {
+        if (event.getWhoClicked().equals(player)) {
+            LobbyManager.getSingleton().getServer().getScheduler().cancelTask(updateCancel);
+            event.setCancelled(true);
+            player.closeInventory();
+            HandlerList.unregisterAll(this);
+            int slot = event.getSlot();
+            if (player.hasPermission("lobbymanager.test")) {
+                switch (slot) {
+                    case 12:
+                        LobbyManager.getSingleton().getServer().getPluginManager().registerEvents(new TestWorldSelect(settings, player, "Survival"), LobbyManager.getSingleton());
+                        break;
+                    case 14:
+                        LobbyManager.getSingleton().getServer().getPluginManager().registerEvents(new TestWorldSelect(settings, player, "TEST"), LobbyManager.getSingleton());
+                        break;
+                    default:
+                        break;
                 }
-                if (i.getItemMeta().getDisplayName().contains("Zombie World")) {
-                    ItemMeta meta = i.getItemMeta();
-                    meta.setLore(serverInfo("zombie", player));
-                    i.setItemMeta(meta);
+            } else {
+                if (slot == 13) {
+                    LobbyManager.getSingleton().getServer().getPluginManager().registerEvents(new TestWorldSelect(settings, player, "Survival"), LobbyManager.getSingleton());
                 }
             }
         }

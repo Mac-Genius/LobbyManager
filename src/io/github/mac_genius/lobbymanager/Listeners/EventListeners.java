@@ -1,27 +1,30 @@
 package io.github.mac_genius.lobbymanager.Listeners;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import io.github.mac_genius.lobbymanager.Listeners.ListenerExtensions.InventoryClick;
 import io.github.mac_genius.lobbymanager.Listeners.ListenerExtensions.PlayerInitializer;
 import io.github.mac_genius.lobbymanager.Listeners.ListenerExtensions.UpdateInvisible;
+import io.github.mac_genius.lobbymanager.LobbyManager;
 import io.github.mac_genius.lobbymanager.NPCHandler.NPCMessages;
-import io.github.mac_genius.lobbymanager.Parkour.ParkourCourse;
 import io.github.mac_genius.lobbymanager.SecondaryThreads.Runnables.KillRunner;
 import io.github.mac_genius.lobbymanager.ServerSettings;
 import io.github.mac_genius.lobbymanager.database.NPCList;
 import io.github.mac_genius.lobbymanager.database.Preferences;
 import io.github.mac_genius.lobbymanager.database.SQLObjects.PlayerPreference;
-import io.github.mac_genius.lobbymanager.database.ServerWhitelist;
+import io.github.mac_genius.lobbymanager.database.TokoinUpdater;
+import io.github.mac_genius.sqleconomy.cache.PlayerBank;
 import net.minecraft.server.v1_8_R3.EnumParticle;
 import net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -45,7 +48,7 @@ public class EventListeners implements Listener {
         this.settings = settings;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void rightClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         try {
@@ -54,22 +57,6 @@ public class EventListeners implements Listener {
             }
             if (player.getPassenger() != null && event.getAction() == Action.LEFT_CLICK_AIR) {
                 throwEntity(event.getPlayer(), event.getPlayer().getPassenger());
-            }
-            if (event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.IRON_PLATE) {
-                if (settings.getParkour().get(player).isInParkour()) {
-                    if (event.getClickedBlock().equals(settings.getParkour().get(player).getCourse().getFinish())) {
-                        settings.getParkour().get(player).finishParkour();
-                    } else if (!event.getClickedBlock().equals(settings.getParkour().get(player).getCheckpointLoc().getBlock())) {
-                        settings.getParkour().get(player).updateCheckpoint(event.getClickedBlock().getLocation());
-                    }
-                } else {
-                    for (ParkourCourse course : settings.getCourses()) {
-                        if (course.getStart().equals(event.getClickedBlock())) {
-                            settings.getParkour().get(player).startParkour(course);
-                            break;
-                        }
-                    }
-                }
             }
         } catch (NullPointerException e) {
             settings.getPlugin().getLogger().warning(Ansi.ansi().fg(Ansi.Color.RED) + "Error with PlayerInteractEvent." + Ansi.ansi().fg(Ansi.Color.WHITE));
@@ -114,55 +101,17 @@ public class EventListeners implements Listener {
         event.setJoinMessage("");
         new PlayerInitializer(settings, player);
         new UpdateInvisible(settings, player);
+        LobbyManager.getSingleton().getServer().getScheduler().runTaskLaterAsynchronously(LobbyManager.getSingleton(), () -> {
+            PlayerBank bank = LobbyManager.getSingleton().getEconomy().getAccount(event.getPlayer());
+            TokoinUpdater.updateScoreboard((int) bank.getBalance(), event.getPlayer());
+        }, 5);
     }
 
     @EventHandler
      public void inventoryReact(InventoryClickEvent event) {
-        if (event.getWhoClicked().getOpenInventory().getTitle().equals("Server Menu:")) {
-            try {
-                if (event.getCurrentItem().getType() == Material.DIAMOND_PICKAXE) {
-                    ServerWhitelist whitelist = new ServerWhitelist(settings);
-                    if (whitelist.getWhitelisted(event.getWhoClicked().getUniqueId().toString())) {
-                        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                        out.writeUTF("Connect");
-                        out.writeUTF("Survival-1");
-                        ((Player) event.getWhoClicked()).sendPluginMessage(settings.getPlugin(), "BungeeCord", out.toByteArray());
-                        event.getWhoClicked().sendMessage("Sending you to Survival!");
-                    } else {
-                        NPCMessages messages = new NPCMessages(settings, (Player) event.getWhoClicked());
-                        if (whitelist.getBanned(event.getWhoClicked().getUniqueId().toString())) {
-                            for (String s : messages.getMessages("vanilla_register")) {
-                                event.getWhoClicked().sendMessage(s);
-                            }
-                        } else if (whitelist.getWhitelistStatus(event.getWhoClicked().getUniqueId().toString()) == 0) {
-                            for (String s : messages.getMessages("van_go")) {
-                                event.getWhoClicked().sendMessage(s);
-                            }
-                        } else {
-                            for (String s : messages.getMessages("van_wait")) {
-                                event.getWhoClicked().sendMessage(s);
-                            }
-                        }
-                    }
-                }
-                if (event.getCurrentItem().getType() == Material.ROTTEN_FLESH) {
-                    ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                    out.writeUTF("Connect");
-                    out.writeUTF("Zombie-1");
-                    ((Player) event.getWhoClicked()).sendPluginMessage(settings.getPlugin(), "BungeeCord", out.toByteArray());
-                    event.getWhoClicked().sendMessage("Sending you to Zombie World!");
-                }
-            } catch (NullPointerException e) {
-                event.setCancelled(true);
-            }
+        if (!event.getWhoClicked().hasPermission("lobbymanager.click")) {
             event.setCancelled(true);
         }
-        else {
-            if (!event.getWhoClicked().hasPermission("lobbymanager.click")) {
-                event.setCancelled(true);
-            }
-        }
-
     }
 
     @EventHandler
@@ -202,26 +151,6 @@ public class EventListeners implements Listener {
     }
 
     @EventHandler
-    public void doubleJump(PlayerToggleFlightEvent event) {
-        if (event.getPlayer().getGameMode() != GameMode.CREATIVE && event.getPlayer().getAllowFlight()) {
-
-            Vector jump = event.getPlayer().getVelocity();
-            jump.setY(0);
-
-            Vector facing = event.getPlayer().getLocation().getDirection();
-            facing = facing.multiply(2.0);
-            jump = jump.add(facing);
-            event.getPlayer().setVelocity(jump);
-            event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.FIREWORK_BLAST, 10, 1);
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                ((CraftPlayer)p).getHandle().playerConnection.sendPacket(new PacketPlayOutWorldParticles(EnumParticle.FIREWORKS_SPARK, true, (float)event.getPlayer().getLocation().getX(), (float)event.getPlayer().getLocation().getY(), (float)event.getPlayer().getLocation().getZ(), (float)0.2, (float)0.0, (float)0.2, (float).1, 10, 0));
-            }
-            event.setCancelled(true);
-            event.getPlayer().setAllowFlight(false);
-        }
-    }
-
-    @EventHandler
     public void drop(PlayerDropItemEvent event) {
         if (!event.getPlayer().hasPermission("lobbymanager.drop")) {
             event.setCancelled(true);
@@ -230,6 +159,9 @@ public class EventListeners implements Listener {
 
     @EventHandler
     public void pickupPlayer(PlayerInteractEntityEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
         if (settings.getNpcs().containsKey(event.getRightClicked())) {
             NPCList list = new NPCList(settings);
             NPCMessages npcMessages = new NPCMessages(settings, event.getPlayer());
@@ -298,11 +230,6 @@ public class EventListeners implements Listener {
             if (p == event.getPlayer()) {
                 settings.getThrown().remove(p);
             }
-        }
-        ArrayList<Player> list = new ArrayList<>(settings.getPlayerPets().keySet());
-        if (list.contains(event.getPlayer())) {
-            settings.getPlayerPets().get(event.getPlayer()).remove();
-            settings.getPlayerPets().remove(event.getPlayer());
         }
     }
 
